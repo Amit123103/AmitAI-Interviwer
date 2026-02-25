@@ -55,7 +55,11 @@ const server = http.createServer(app);
 app.use(cors({
     origin: process.env.CORS_ORIGIN
         ? process.env.CORS_ORIGIN.split(',')
-        : ['http://localhost:3000'],
+        : [
+            'http://localhost:3000',
+            'https://amit-ai-interviwer.vercel.app',
+            'https://amit-ai-interviwer-10x6s7ee6-amitakhil001-7185s-projects.vercel.app',
+        ],
     credentials: true,
 }));
 app.use(helmetMiddleware);      // Security headers
