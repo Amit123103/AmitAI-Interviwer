@@ -122,7 +122,11 @@ export default function SignupPage() {
             setSignupSuccess(true)
             setTimeout(() => router.push("/auth/login"), 3000)
         } catch (err: any) {
-            setError(err.response?.data?.message || "Something went wrong")
+            if (err.code === 'ERR_NETWORK' || !err.response) {
+                setError("Cannot connect to server. Please try again later.")
+            } else {
+                setError(err.response?.data?.message || "Something went wrong")
+            }
         } finally {
             setLoading(false)
         }
