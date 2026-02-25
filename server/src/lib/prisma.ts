@@ -1,7 +1,4 @@
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient({
-    log: ['query', 'info', 'warn', 'error'],
-})
-
+// Prisma is no longer used — project migrated to MongoDB/Mongoose.
+// This stub prevents import errors from any remaining references.
+const prisma = {} as any
 export default prisma

@@ -15,10 +15,10 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-    destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+    destination: (req: Request, file: any, cb: any) => {
         cb(null, uploadDir);
     },
-    filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+    filename: (req: Request, file: any, cb: any) => {
         let prefix = 'interview';
         if (file.fieldname === 'resume') prefix = 'resume';
         if (file.fieldname === 'frame') prefix = 'frame';

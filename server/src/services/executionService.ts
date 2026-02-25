@@ -135,7 +135,7 @@ export class ExecutionService {
         }
 
         // Run all test cases
-        const results = [];
+        const results: any[] = [];
         let allPassed = true;
 
         for (let i = 0; i < allTestCases.length; i++) {
@@ -188,7 +188,7 @@ export class ExecutionService {
                 runtime: Date.now() - startTime,
                 memory: 0, // Piston doesn't report memory usage
             },
-            errorType: allPassed ? undefined : (results.find(r => r.error)?.error?.includes('Time Limit') ? 'time_limit_exceeded' : undefined),
+            errorType: allPassed ? undefined : ((results.find((r: any) => r.error)?.error?.includes('Time Limit') ? 'time_limit_exceeded' : undefined) as ErrorType | undefined),
         };
     }
 
@@ -247,7 +247,7 @@ export class ExecutionService {
     // ─── JavaScript VM Test Case Judging ──────────────────────────────────────
     private async executeJavaScriptVM(code: string, problem: IProblem): Promise<ExecutionResult> {
         const startTime = process.hrtime();
-        const results = [];
+        const results: any[] = [];
         let allPassed = true;
 
         const allTestCases = [...problem.examples, ...problem.testCases];

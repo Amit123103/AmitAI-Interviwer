@@ -109,7 +109,7 @@ export async function buildRAGContext(params: {
     const cvInsights = extractCVInsights(params.cvText || '')
 
     // Attempt deep analysis from Python AI Service
-    let deepAnalysis = null
+    let deepAnalysis: any = null
     try {
         const aiRes = await axios.post(`${AI_SERVICE_URL}/resume/analyze`, {
             resume_text: params.cvText,

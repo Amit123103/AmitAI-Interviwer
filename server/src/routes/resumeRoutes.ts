@@ -16,10 +16,10 @@ const Tesseract = require('tesseract.js');
 
 // Multer setup
 const storage = multer.diskStorage({
-    destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+    destination: (req: any, file: any, cb: any) => {
         cb(null, 'uploads/');
     },
-    filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+    filename: (req: any, file: any, cb: any) => {
         cb(null, `${Date.now()}-${file.originalname}`);
     }
 });
@@ -27,7 +27,7 @@ const storage = multer.diskStorage({
 const upload = multer({
     storage,
     limits: { fileSize: 10 * 1024 * 1024 }, // 10 MB max
-    fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    fileFilter: (req: any, file: any, cb: any) => {
         const allowedMimes = [
             'application/pdf',
             'application/msword',

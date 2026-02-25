@@ -192,7 +192,7 @@ function generateQuestions() {
         ]
     }
 
-    const generatedQuestions = []
+    const generatedQuestions: any[] = []
 
     // Generate 200 technical questions
     for (let i = 0; i < 200; i++) {

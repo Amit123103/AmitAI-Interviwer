@@ -293,7 +293,7 @@ export const getSession = async (req: Request, res: Response) => {
             currentProblem = await Problem.findById(currentQ.problemId);
             if (currentProblem) {
                 // Hide hidden test cases
-                const obj = currentProblem.toObject();
+                const obj = (currentProblem as any).toObject();
                 obj.testCases = obj.testCases.filter((tc: any) => !tc.isHidden);
                 currentProblem = obj;
             }
