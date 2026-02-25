@@ -89,7 +89,7 @@ async def favicon():
     """Return empty response for favicon requests to prevent 404 logs."""
     return Response(content=b"", media_type="image/x-icon")
 
-@app.get("/")
+@app.api_route("/", methods=["GET", "HEAD"])
 async def root():
     return {
         "message": "AI Interviewer Service is running",
@@ -97,7 +97,7 @@ async def root():
         "status": "online"
     }
 
-@app.get("/health")
+@app.api_route("/health", methods=["GET", "HEAD"])
 async def health():
     """Lightweight health ping — no Ollama call. Used by Node server polling."""
     return {
@@ -128,5 +128,6 @@ async def health_deep():
     }
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    port = int(os.getenv("PORT", 8000))
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
