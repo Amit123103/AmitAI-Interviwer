@@ -58,6 +58,7 @@ app.use(cors({
         : [
             'http://localhost:3000',
             'https://amit-ai-interviwer.vercel.app',
+            'https://amit-ai-interviwer-git-main-amitakhil001-7185s-projects.vercel.app',
             'https://amit-ai-interviwer-10x6s7ee6-amitakhil001-7185s-projects.vercel.app',
         ],
     credentials: true,
@@ -194,8 +195,7 @@ server.listen(PORT, async () => {
     const { verifyEmailTransporter } = require('./services/emailService');
     verifyEmailTransporter().then((ok: boolean) => {
         if (!ok) {
-            console.warn('  ⚠️  Email: NOT configured — password reset emails will not be sent');
-            console.warn('     → Create a .env file with SMTP_HOST, SMTP_USER, SMTP_PASS');
+            console.log('  ℹ️  Email: disabled (optional — set SMTP_HOST, SMTP_USER, SMTP_PASS to enable)');
         }
     }).catch(() => { });
 

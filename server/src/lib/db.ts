@@ -10,7 +10,7 @@ dotenv.config();
 const getDatabaseUrl = () => {
     const url = process.env.DATABASE_URL;
     if (!url) {
-        console.warn('[DB] SQL Authority: DATABASE_URL is undefined.');
+        // Silently skip — this project primarily uses MongoDB
         return undefined;
     }
 

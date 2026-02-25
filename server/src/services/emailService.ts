@@ -31,19 +31,7 @@ const SMTP_FROM = process.env.SMTP_FROM || SMTP_USER;
 const smtpConfigured = !!(SMTP_HOST && SMTP_USER && SMTP_PASS);
 
 if (!smtpConfigured) {
-    console.warn('╔═══════════════════════════════════════════════════════════╗');
-    console.warn('║  ⚠️  EMAIL SERVICE: SMTP NOT CONFIGURED                  ║');
-    console.warn('║                                                           ║');
-    console.warn('║  Missing env vars: SMTP_HOST, SMTP_USER, SMTP_PASS       ║');
-    console.warn('║  Emails will NOT be sent until these are set.             ║');
-    console.warn('║                                                           ║');
-    console.warn('║  For Gmail:                                               ║');
-    console.warn('║    SMTP_HOST=smtp.gmail.com                               ║');
-    console.warn('║    SMTP_PORT=587                                          ║');
-    console.warn('║    SMTP_SECURE=false                                      ║');
-    console.warn('║    SMTP_USER=your@gmail.com                               ║');
-    console.warn('║    SMTP_PASS=xxxx xxxx xxxx xxxx  (App Password)          ║');
-    console.warn('╚═══════════════════════════════════════════════════════════╝');
+    console.log('[EMAIL] ℹ️  SMTP not configured — email features disabled (set SMTP_HOST, SMTP_USER, SMTP_PASS to enable)');
 }
 
 // ── Create transporter (only real if configured) ──
