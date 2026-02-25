@@ -1,0 +1,49 @@
+# Dependencies
+node_modules/
+.venv/
+venv/
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Build output
+dist/
+build/
+.next/
+out/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Logs
+*.log
+ai-service/ai_error.log
+ai-service/debug_log.txt
+ai-service/debug_log_new.txt
+ai-service/import_error.txt
+ai-service/startup_diag.log
+ai-service/startup_error.log
+ai-service/startup_service.log
+
+# Temp files
+ai-service/temp_*.webm
+
+# Uploads (large files)
+server/uploads/
+
+# Backup files
+ai-service/ai_service_backup.py
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
