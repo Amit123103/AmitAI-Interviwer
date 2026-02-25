@@ -1,5 +1,5 @@
-/// <reference path="../types/express.d.ts" />
-import express from 'express'
+/// <reference path="../types/express-augment.d.ts" />
+import express, { Request, Response } from 'express'
 import { protect } from '../middleware/authMiddleware'
 import Question from '../models/Question'
 import UserQuestionProgress from '../models/UserQuestionProgress'
@@ -8,7 +8,7 @@ import CustomQuestionList from '../models/CustomQuestionList'
 const router = express.Router()
 
 // Get all questions with filters
-router.get('/', protect, async (req, res) => {
+router.get('/', protect, async (req: Request, res: Response) => {
     try {
         const { role, difficulty, type, search, page = '1', limit = '20' } = req.query
 
@@ -40,7 +40,7 @@ router.get('/', protect, async (req, res) => {
 })
 
 // Get question by ID
-router.get('/:id', protect, async (req, res) => {
+router.get('/:id', protect, async (req: Request, res: Response) => {
     try {
         const question = await Question.findById(req.params.id)
             .populate('relatedQuestions', 'title type difficulty')
@@ -59,7 +59,7 @@ router.get('/:id', protect, async (req, res) => {
 })
 
 // Record practice
-router.post('/practice', protect, async (req, res) => {
+router.post('/practice', protect, async (req: Request, res: Response) => {
     try {
         const { questionId, score, duration, feedback } = req.body
 
@@ -101,7 +101,7 @@ router.post('/practice', protect, async (req, res) => {
 })
 
 // Get user progress
-router.get('/user/progress', protect, async (req, res) => {
+router.get('/user/progress', protect, async (req: Request, res: Response) => {
     try {
         const progress = await UserQuestionProgress.find({ userId: req.user!._id })
             .populate('questionId', 'title type difficulty')
@@ -112,7 +112,7 @@ router.get('/user/progress', protect, async (req, res) => {
 })
 
 // Toggle bookmark
-router.post('/bookmark', protect, async (req, res) => {
+router.post('/bookmark', protect, async (req: Request, res: Response) => {
     try {
         const { questionId } = req.body
 
@@ -139,7 +139,7 @@ router.post('/bookmark', protect, async (req, res) => {
 })
 
 // Get user's custom lists
-router.get('/lists', protect, async (req, res) => {
+router.get('/lists', protect, async (req: Request, res: Response) => {
     try {
         const lists = await CustomQuestionList.find({ userId: req.user!._id })
             .populate('questions', 'title type difficulty')
@@ -151,7 +151,7 @@ router.get('/lists', protect, async (req, res) => {
 })
 
 // Create custom list
-router.post('/lists', protect, async (req, res) => {
+router.post('/lists', protect, async (req: Request, res: Response) => {
     try {
         const list = new CustomQuestionList({
             userId: req.user!._id,
@@ -167,7 +167,7 @@ router.post('/lists', protect, async (req, res) => {
 })
 
 // Update custom list
-router.put('/lists/:id', protect, async (req, res) => {
+router.put('/lists/:id', protect, async (req: Request, res: Response) => {
     try {
         const list = await CustomQuestionList.findOneAndUpdate(
             { _id: req.params.id, userId: req.user!._id },
@@ -183,7 +183,7 @@ router.put('/lists/:id', protect, async (req, res) => {
 })
 
 // Delete custom list
-router.delete('/lists/:id', protect, async (req, res) => {
+router.delete('/lists/:id', protect, async (req: Request, res: Response) => {
     try {
         const list = await CustomQuestionList.findOneAndDelete({
             _id: req.params.id,

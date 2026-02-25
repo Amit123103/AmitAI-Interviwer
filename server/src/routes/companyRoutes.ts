@@ -1,4 +1,4 @@
-/// <reference path="../types/express.d.ts" />
+/// <reference path="../types/express-augment.d.ts" />
 import express from 'express'
 import { protect } from '../middleware/authMiddleware'
 import Company from '../models/Company'

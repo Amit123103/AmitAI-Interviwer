@@ -1,4 +1,4 @@
-import express from 'express';
+import express, { Request } from 'express';
 import { createReport, getReportsByUser, getReportById, getStats, analyzeResume, analyzeFrame, getAllReports } from '../controllers/reportController';
 import { protect, adminOnly } from '../middleware/authMiddleware';
 
@@ -15,10 +15,10 @@ if (!fs.existsSync(uploadDir)) {
 }
 
 const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
+    destination: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
         cb(null, uploadDir);
     },
-    filename: (req, file, cb) => {
+    filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
         let prefix = 'interview';
         if (file.fieldname === 'resume') prefix = 'resume';
         if (file.fieldname === 'frame') prefix = 'frame';

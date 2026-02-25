@@ -1,11 +1,11 @@
-import express from 'express';
+import express, { Request, Response } from 'express';
 import axios from 'axios';
 
 const router = express.Router();
 
 const AI_SERVICE_URL = process.env.AI_SERVICE_URL || 'http://localhost:8000';
 
-router.get('/status', async (req, res) => {
+router.get('/status', async (req: Request, res: Response) => {
     let aiStatus = 'offline';
     let ollamaStatus = 'offline';
     let mongoStatus = 'offline';
