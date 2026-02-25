@@ -1,13 +1,27 @@
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.responses import Response
 from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import uvicorn
 import os
 import time
 import threading
-import ollama
-import whisper
 from dotenv import load_dotenv
+
+# Graceful imports — ollama and whisper may not be available on cloud platforms
+try:
+    import ollama
+    HAS_OLLAMA = True
+except ImportError:
+    HAS_OLLAMA = False
+    print("⚠️  ollama not available — LLM features will use fallback mode")
+
+try:
+    import whisper
+    HAS_WHISPER = True
+except ImportError:
+    HAS_WHISPER = False
+    print("⚠️  whisper not available — STT features will use fallback mode")
 
 # Import modular routers
 from app.api.resume import router as resume_router
@@ -34,6 +48,9 @@ async def lifespan(app: FastAPI):
     
     def warmup():
         global _ollama_ready
+        if not HAS_OLLAMA:
+            print("Skipping Ollama warmup — not installed")
+            return
         try:
             print("Warming up Ollama...")
             ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": "hi"}], options={"num_predict": 5})
@@ -67,6 +84,11 @@ app.include_router(technical_router)
 app.include_router(adaptive_router)
 app.include_router(coding_router)
 
+@app.get("/favicon.ico")
+async def favicon():
+    """Return empty response for favicon requests to prevent 404 logs."""
+    return Response(content=b"", media_type="image/x-icon")
+
 @app.get("/")
 async def root():
     return {
@@ -89,11 +111,14 @@ async def health():
 async def health_deep():
     """Deep health check — actually pings Ollama. Use sparingly."""
     ollama_status = "unknown"
-    try:
-        ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": "hi"}], options={"num_predict": 1})
-        ollama_status = "online"
-    except Exception as e:
-        ollama_status = f"offline: {str(e)}"
+    if not HAS_OLLAMA:
+        ollama_status = "not_installed"
+    else:
+        try:
+            ollama.chat(model=MODEL_NAME, messages=[{"role": "user", "content": "hi"}], options={"num_predict": 1})
+            ollama_status = "online"
+        except Exception as e:
+            ollama_status = f"offline: {str(e)}"
 
     return {
         "status": "healthy" if "offline" not in ollama_status else "degraded",
