@@ -1,17 +1,13 @@
-
 import { Request, Response } from 'express';
 import User from '../models/User';
-
-const XP_PER_LEVEL_BASE = 1000;
-
 import { updateUserProgress } from '../services/gamificationService';
 
 export const updateProgress = async (req: any, res: Response) => {
     try {
         const userId = req.user?.id;
-        const { xpGained, statsUpdate } = req.body;
+        const { coinsGained, statsUpdate } = req.body;
 
-        const result = await updateUserProgress(userId!, xpGained, statsUpdate);
+        const result = await updateUserProgress(userId!, coinsGained, statsUpdate);
 
         res.json(result);
 
@@ -23,11 +19,11 @@ export const updateProgress = async (req: any, res: Response) => {
 export const getLeaderboard = async (req: any, res: Response) => {
     try {
         const { period } = req.query;
-        let sortField = 'xp';
-        let selectField = 'username xp level achievements weeklyXp';
+        let sortField = 'amitaiCoins';
+        let selectField = 'username amitaiCoins level achievements weeklyCoins';
 
         if (period === 'weekly') {
-            sortField = 'weeklyXp';
+            sortField = 'weeklyCoins';
         }
 
         const topUsers = await User.find({})
@@ -44,8 +40,8 @@ export const getLeaderboard = async (req: any, res: Response) => {
 export const claimDailyReward = async (req: any, res: Response) => {
     try {
         const userId = req.user?.id;
-        const result = await updateUserProgress(userId!, 50, { type: 'daily_claim' }); // 50 XP for checking in
-        res.json({ message: 'Daily reward claimed!', ...result });
+        const result = await updateUserProgress(userId!, 100, { type: 'daily_claim' }); // 100 Coins for checking in
+        res.json({ message: 'AmitAI Coins claimed!', ...result });
     } catch (error) {
         res.status(500).json({ message: 'Error claiming reward', error });
     }

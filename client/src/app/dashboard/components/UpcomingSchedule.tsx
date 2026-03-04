@@ -77,10 +77,10 @@ export default function UpcomingSchedule() {
     }
 
     return (
-        <div className="bg-zinc-900/40 backdrop-blur-xl border border-white/10 p-8 rounded-2xl relative overflow-hidden group h-full flex flex-col">
-            {/* Rainbow accent bar */}
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-blue-500 via-indigo-500 via-violet-500 to-purple-500" />
-            <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full blur-3xl -z-10" />
+        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/5 p-8 rounded-2xl relative overflow-hidden group h-full flex flex-col shadow-2xl">
+            {/* Blue accent bar */}
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-blue-500/50 to-transparent" />
+            <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -z-10" />
 
             <div className="flex items-center justify-between mb-8 relative z-10">
                 <div className="flex items-center gap-3">
@@ -88,8 +88,8 @@ export default function UpcomingSchedule() {
                         <Calendar className="w-5 h-5 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-white">Upcoming Sessions</h3>
-                        <p className="text-xs text-zinc-500">What's coming up</p>
+                        <h3 className="text-lg font-bold text-white tracking-tight">Upcoming Sessions</h3>
+                        <p className="text-xs text-slate-500">Stay prepared for what's next</p>
                     </div>
                 </div>
                 <button
@@ -104,7 +104,7 @@ export default function UpcomingSchedule() {
             </div>
 
             <div className="flex-1 space-y-6 relative z-10">
-                <div className="absolute left-[19px] top-2 bottom-8 w-[2px] bg-gradient-to-b from-blue-500/50 via-indigo-500/20 to-transparent" />
+                <div className="absolute left-[19px] top-2 bottom-8 w-[2px] bg-gradient-to-b from-blue-500/30 to-transparent" />
 
                 {sessions.map((session, idx) => (
                     <motion.div
@@ -115,9 +115,9 @@ export default function UpcomingSchedule() {
                         className="relative pl-12 group/item"
                     >
                         {/* Timeline Core */}
-                        <div className={`absolute left-0 top-1 w-10 h-10 rounded-xl bg-zinc-950 border border-white/10 flex items-center justify-center z-20 transition-all duration-300 ${idx === 0 ? 'border-blue-500/40 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'group-hover/item:border-white/20'
+                        <div className={`absolute left-0 top-1 w-10 h-10 rounded-xl bg-slate-950 border border-white/10 flex items-center justify-center z-20 transition-all duration-300 ${idx === 0 ? 'border-blue-500/40 shadow-[0_0_15px_rgba(59,130,246,0.1)]' : 'group-hover/item:border-white/20'
                             }`}>
-                            {idx === 0 ? <Video className="w-4 h-4 text-blue-400 animate-pulse" /> : <Clock className="w-4 h-4 text-zinc-500 group-hover/item:text-zinc-300" />}
+                            {idx === 0 ? <Video className="w-4 h-4 text-blue-400 animate-pulse" /> : <Clock className="w-4 h-4 text-slate-500 group-hover/item:text-slate-300" />}
                         </div>
 
                         <div className="space-y-2">
@@ -131,7 +131,7 @@ export default function UpcomingSchedule() {
                             </div>
                             <div className="bg-white/[0.03] border border-white/5 p-4 rounded-2xl group-hover/item:bg-white/[0.06] group-hover/item:border-white/10 transition-all relative overflow-visible">
                                 <h4 className="font-bold text-white text-sm mb-1">{session.title}</h4>
-                                <p className="text-[10px] text-zinc-500 font-medium mb-3">{session.role} • {session.type}</p>
+                                <p className="text-[10px] text-slate-500 font-medium mb-3">{session.role} • {session.type}</p>
 
                                 <div className="flex items-center gap-2">
                                     <button

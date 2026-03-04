@@ -2,20 +2,21 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from "react"
 import Logo from "@/components/ui/Logo"
+import CareerGrowthHub from "./components/CareerGrowthHub"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { User, Settings, LogOut, Play, History, Trophy, FileText, TrendingUp, Zap, Target, Code2, Search, Users, Building2, Sparkles, Brain, BookOpen, Award, Terminal, Video, Menu, X } from "lucide-react"
+import { User, Settings, LogOut, Play, History, Trophy, FileText, TrendingUp, Zap, Target, Code2, Search, Users, Building2, Sparkles, Brain, BookOpen, Award, Terminal, Video, Menu, X, PanelLeftClose, PanelLeft, PenTool, Coffee, Map } from "lucide-react"
 import Link from "next/link"
 import dynamic from "next/dynamic"
 import { motion, AnimatePresence } from "framer-motion"
 import TiltCard from "@/components/ui/TiltCard"
+import AmitAICoin from "@/components/reward-system/AmitAICoin"
+import CoinRewardAnimation from "@/components/reward-system/CoinRewardAnimation"
 
 const Shimmer = () => <div className="w-full h-full min-h-[100px] animate-pulse bg-white/5 rounded-3xl" />
 
 // Dynamic loading heavy components with skeletons for perceived speed
-const MeshBackground = dynamic(() => import("./components/MeshBackground"), { ssr: false })
-const HolographicHud = dynamic(() => import("@/components/ui/HolographicHud"), { ssr: false })
 const SuccessWall = dynamic(() => import("@/components/SuccessWall"), { ssr: false })
 const GamificationPanel = dynamic(() => import("@/components/gamification/GamificationPanel"), { ssr: false, loading: () => <Shimmer /> })
 const SarahBriefing = dynamic(() => import("./components/SarahBriefing"), { ssr: false, loading: () => <Shimmer /> })
@@ -26,7 +27,6 @@ const ReadinessGauge = dynamic(() => import("./components/ReadinessGauge"), { ss
 const StudyTimer = dynamic(() => import("./components/StudyTimer"), { ssr: false, loading: () => <Shimmer /> })
 const QuickTips = dynamic(() => import("./components/QuickTips"), { ssr: false, loading: () => <Shimmer /> })
 const UpcomingSchedule = dynamic(() => import("./components/UpcomingSchedule"), { ssr: false, loading: () => <Shimmer /> })
-const StreakFlame = dynamic(() => import("./components/StreakFlame"), { ssr: false, loading: () => <Shimmer /> })
 const CommandPalette = dynamic(() => import("./components/CommandPalette"), { ssr: false })
 const LiveStatsBar = dynamic(() => import("./components/LiveStatsBar"), { ssr: false, loading: () => <Shimmer /> })
 const InterviewSimPreview = dynamic(() => import("./components/InterviewSimPreview"), { ssr: false, loading: () => <Shimmer /> })
@@ -34,6 +34,7 @@ const WeaknessRadar = dynamic(() => import("./components/WeaknessRadar"), { ssr:
 const NotificationCenter = dynamic(() => import("./components/NotificationCenter"), { ssr: false })
 const ActivityTimeline = dynamic(() => import("./components/ActivityTimeline"), { ssr: false, loading: () => <Shimmer /> })
 const ResourcesVault = dynamic(() => import("./components/ResourcesVault"), { ssr: false, loading: () => <Shimmer /> })
+const HiringPartners = dynamic(() => import("./components/HiringPartners"), { ssr: false })
 
 // Recharts optimization with loaders
 const ResponsiveContainer = dynamic(() => import('recharts').then(mod => mod.ResponsiveContainer), { ssr: false, loading: () => <div className="h-[300px] w-full bg-white/5 animate-pulse rounded-2xl" /> })
@@ -50,6 +51,26 @@ export default function DashboardPage() {
     const [stats, setStats] = useState<any>(null)
     const [reports, setReports] = useState<any[]>([])
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [isDesktopSidebarOpen, setIsDesktopSidebarOpen] = useState(true)
+
+    // Reward animation state
+    const [showReward, setShowReward] = useState(false)
+    const [earnedAmount, setEarnedAmount] = useState(0)
+
+    useEffect(() => {
+        const savedLayoutPrefs = localStorage.getItem('desktopSidebar');
+        if (savedLayoutPrefs === 'closed') {
+            setIsDesktopSidebarOpen(false);
+        }
+    }, [])
+
+    const toggleDesktopSidebar = () => {
+        setIsDesktopSidebarOpen(prev => {
+            const newState = !prev;
+            localStorage.setItem('desktopSidebar', newState ? 'open' : 'closed');
+            return newState;
+        })
+    }
 
     useEffect(() => {
         const savedUser = localStorage.getItem("user")
@@ -80,6 +101,15 @@ export default function DashboardPage() {
 
                     // Sync and update user
                     const updatedUser = { ...userData, ...gamificationData }
+
+                    // Check for reward trigger
+                    const oldCoins = userData.amitaiCoins || 0;
+                    const newCoins = updatedUser.amitaiCoins || 0;
+                    if (newCoins > oldCoins) {
+                        setEarnedAmount(newCoins - oldCoins);
+                        setShowReward(true);
+                    }
+
                     setUser(updatedUser)
                     localStorage.setItem("user", JSON.stringify(updatedUser))
 
@@ -91,7 +121,7 @@ export default function DashboardPage() {
                         setReports(reportsData.reverse().slice(0, 3))
                     }
                 } catch (err) {
-                    console.error("Critical dashboard fetch error:", err)
+                    console.warn("Expected dashboard fetch failure (backend offline):", err)
                     setUser(userData) // Fallback to saved user
                 }
             }
@@ -108,20 +138,44 @@ export default function DashboardPage() {
     if (!user) return null
 
     return (
-        <div className="flex min-h-screen bg-transparent text-white relative">
-            <MeshBackground />
-            <HolographicHud />
+        <div className="flex min-h-screen tech-blueprint-bg text-white relative font-sans selection:bg-indigo-500/30">
             <CommandPalette />
 
+            <CoinRewardAnimation
+                isVisible={showReward}
+                onComplete={() => setShowReward(false)}
+                coinsEarned={earnedAmount}
+            />
+
             {/* Mobile Top Bar */}
-            <div className="md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-zinc-950/90 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4">
+            <div className={`md:hidden fixed top-0 left-0 right-0 z-50 h-14 bg-zinc-950/90 backdrop-blur-xl border-b border-white/5 flex items-center justify-between px-4`}>
                 <Link href="/dashboard" className="flex items-center">
                     <Logo size={32} showStatus />
                 </Link>
-                <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 flex items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white">
+                <button onClick={() => setSidebarOpen(!sidebarOpen)} className="w-10 h-10 flex md:hidden items-center justify-center rounded-xl bg-white/5 border border-white/10 text-white shadow-inner">
                     {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
                 </button>
             </div>
+
+            {/* Desktop Top Bar (Visible when sidebar is closed) */}
+            <AnimatePresence>
+                {!isDesktopSidebarOpen && (
+                    <motion.div
+                        initial={{ y: -100, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        exit={{ y: -100, opacity: 0 }}
+                        transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                        className="hidden md:flex fixed top-0 left-0 right-0 z-50 h-16 bg-zinc-950/90 backdrop-blur-xl border-b border-white/5 items-center justify-between px-6 shadow-2xl"
+                    >
+                        <Link href="/dashboard" className="flex items-center group">
+                            <Logo size={36} showStatus showText />
+                        </Link>
+                        <Button variant="ghost" size="icon" onClick={toggleDesktopSidebar} className="text-zinc-400 hover:text-white transition-all h-10 w-10">
+                            <PanelLeft className="w-5 h-5" />
+                        </Button>
+                    </motion.div>
+                )}
+            </AnimatePresence>
 
             {/* Mobile Sidebar Overlay */}
             <AnimatePresence>
@@ -139,7 +193,7 @@ export default function DashboardPage() {
                             animate={{ x: 0 }}
                             exit={{ x: -280 }}
                             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-                            className="fixed top-0 left-0 bottom-0 w-[280px] bg-zinc-950/95 backdrop-blur-xl border-r border-white/5 z-40 flex flex-col md:hidden overflow-y-auto custom-scrollbar"
+                            className="fixed top-0 left-0 bottom-0 w-[280px] bg-zinc-950/95 backdrop-blur-xl border-r border-white/5 z-40 flex flex-col md:hidden overflow-y-auto custom-scrollbar shadow-2xl"
                         >
                             <div className="p-6 pt-8">
                                 <Link href="/dashboard" className="flex items-center" onClick={() => setSidebarOpen(false)}>
@@ -149,25 +203,28 @@ export default function DashboardPage() {
                             <nav className="flex-1 px-4 space-y-1 mt-2">
                                 {[
                                     { href: "/dashboard", icon: <User className="w-4 h-4 text-white" />, label: "Dashboard", bg: "bg-gradient-to-br from-indigo-500 to-teal-500", active: true },
-                                    { href: "/dashboard/resume", icon: <FileText className="w-4 h-4 text-emerald-400" />, label: "Resume Review", bg: "bg-emerald-500/10" },
-                                    { href: "/dashboard/code", icon: <Code2 className="w-4 h-4 text-purple-400" />, label: "Coding Practice", bg: "bg-purple-500/10" },
-                                    { href: "/dashboard/technical/details", icon: <Terminal className="w-4 h-4 text-blue-400" />, label: "Technical Round", bg: "bg-blue-500/10" },
-                                    { href: "/dashboard/history", icon: <History className="w-4 h-4 text-emerald-400" />, label: "History", bg: "bg-emerald-500/10" },
-                                    { href: "/dashboard/onsite", icon: <Building2 className="w-4 h-4 text-amber-400" />, label: "Virtual Onsite", bg: "bg-amber-500/10" },
-                                    { href: "/dashboard/leaderboard", icon: <Trophy className="w-4 h-4 text-yellow-400" />, label: "Leaderboard", bg: "bg-yellow-500/10" },
-                                    { href: "/dashboard/analytics", icon: <TrendingUp className="w-4 h-4 text-orange-400" />, label: "Analytics", bg: "bg-orange-500/10" },
-                                    { href: "/dashboard/resources", icon: <BookOpen className="w-4 h-4 text-emerald-400" />, label: "Learning Library", bg: "bg-emerald-500/10" },
-                                    { href: "/dashboard/settings", icon: <Settings className="w-4 h-4 text-zinc-400" />, label: "Settings", bg: "bg-zinc-500/10" },
-                                ].map(item => (
-                                    <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
-                                        className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.active ? 'bg-gradient-to-r from-indigo-500/15 to-teal-500/10 border border-indigo-500/20 text-white font-semibold' : 'text-zinc-400 hover:bg-white/5 hover:text-white'}`}>
-                                        <div className={`w-8 h-8 rounded-lg ${item.bg} flex items-center justify-center`}>{item.icon}</div>
-                                        <span className="text-sm font-medium">{item.label}</span>
-                                    </Link>
-                                ))}
+                                    { href: "/dashboard/cv-builder", icon: <FileText className="w-4 h-4 text-cyan-400" />, label: "CV Builder", bg: "bg-cyan-500/10" },
+                                    { href: "/dashboard/portfolio-builder", icon: <Sparkles className="w-4 h-4 text-purple-400" />, label: "Portfolio Builder", bg: "bg-purple-500/10" },
+                                    { href: "/dashboard/roadmap", icon: <Map className="w-4 h-4 text-amber-500" />, label: "Career Roadmap", bg: "bg-amber-500/10" },
+                                    { href: "/dashboard/feynman", icon: <Brain className="w-4 h-4 text-blue-400" />, label: "Feynman Explainer", bg: "bg-blue-500/10" },
+                                    { href: "/dashboard/resume", icon: <FileText className="w-4 h-4 text-emerald-400" />, label: "Resume Optimizer", bg: "bg-emerald-500/10" },
+                                    { href: "/dashboard/code", icon: <Code2 className="w-4 h-4 text-purple-400" />, label: "Coding Hub", bg: "bg-purple-500/10" },
+                                    { href: "/dashboard/technical/details", icon: <Terminal className="w-4 h-4 text-blue-400" />, label: "Round Prep", bg: "bg-blue-500/10" },
+                                    { href: "/dashboard/advanced-notes", icon: <PenTool className="w-4 h-4 text-rose-400" />, label: "Advanced Notes", bg: "bg-rose-500/10" },
+                                    { href: "/dashboard/pomodoro", icon: <Coffee className="w-4 h-4 text-orange-400" />, label: "Pomodoro Hub", bg: "bg-orange-500/10" },
+                                    { href: "/dashboard/history", icon: <History className="w-4 h-4 text-emerald-400" />, label: "Vault", bg: "bg-emerald-500/10" },
+                                    { href: "/dashboard/leaderboard", icon: <Trophy className="w-4 h-4 text-yellow-400" />, label: "Global Rank", bg: "bg-yellow-500/10" },
+                                ]
+                                    .map(item => (
+                                        <Link key={item.href} href={item.href} onClick={() => setSidebarOpen(false)}
+                                            className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${item.active ? 'bg-gradient-to-r from-indigo-500/15 to-teal-500/10 border border-indigo-500/20 text-white font-semibold shadow-lg' : 'text-zinc-400 hover:bg-white/5 hover:text-white'}`}>
+                                            <div className={`w-8 h-8 rounded-lg ${item.bg} flex items-center justify-center shadow-inner`}>{item.icon}</div>
+                                            <span className="text-sm font-medium">{item.label}</span>
+                                        </Link>
+                                    ))}
                             </nav>
-                            <div className="p-4 border-t border-white/5">
-                                <Button variant="ghost" className="w-full justify-start gap-3 text-zinc-500 hover:text-white hover:bg-white/5" onClick={() => { handleLogout(); setSidebarOpen(false); }}>
+                            <div className="p-4 border-t border-white/5 font-medium">
+                                <Button variant="ghost" className="w-full h-12 justify-start gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl px-4" onClick={() => { handleLogout(); setSidebarOpen(false); }}>
                                     <LogOut className="w-5 h-5" />
                                     <span>Logout</span>
                                 </Button>
@@ -178,226 +235,172 @@ export default function DashboardPage() {
             </AnimatePresence>
 
             {/* Sidebar - Desktop only */}
-            <aside className="w-64 bg-zinc-950/80 backdrop-blur-xl border-r border-white/5 hidden md:flex flex-col sticky top-0 h-screen z-20 overflow-y-auto overflow-x-hidden custom-scrollbar">
-                <div className="p-6">
-                    <Link href="/dashboard" className="flex items-center group">
-                        <Logo size={36} showText showStatus />
-                    </Link>
-                </div>
-
-                {/* User Profile Card */}
-                <div className="mx-4 mb-6 mt-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] relative overflow-hidden">
-                    <div className="flex items-center gap-3 mb-3">
-                        <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-indigo-500/10 flex items-center justify-center">
-                            <User className="w-5 h-5 text-indigo-400" />
-                        </div>
-                        <div className="min-w-0">
-                            <p className="text-sm font-semibold text-zinc-200 truncate">{user.username || 'Candidate'}</p>
-                            <div className="flex items-center gap-1.5 mt-0.5">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
-                                <span className="text-[10px] text-emerald-400/80">Active</span>
-                            </div>
-                        </div>
-                    </div>
-                    <p className="text-xs text-zinc-500">Welcome back! Keep up the momentum.</p>
-                </div>
-                <nav className="flex-1 px-4 space-y-1 mt-6">
-                    <Link href="/dashboard" className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500/15 to-teal-500/10 border border-indigo-500/15 text-white font-semibold transition-all group">
-                        <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-teal-500 flex items-center justify-center"><User className="w-4 h-4 text-white" /></div>
-                        <span className="text-sm font-semibold text-indigo-300">Dashboard</span>
-                    </Link>
-                    <Link href="/dashboard/resume" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/15 transition-all"><FileText className="w-4 h-4 text-emerald-400" /></div>
-                        <span className="text-sm font-medium">Resume Review</span>
-                    </Link>
-                    <Link href="/dashboard/code" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-purple-500/10 flex items-center justify-center group-hover:bg-purple-500/15 transition-all"><Code2 className="w-4 h-4 text-purple-400" /></div>
-                        <span className="text-sm font-medium">Coding Practice</span>
-                    </Link>
-                    <Link href="/dashboard/technical/details" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center group-hover:bg-blue-500/15 transition-all"><Terminal className="w-4 h-4 text-blue-400" /></div>
-                        <span className="text-sm font-medium">Technical Round</span>
-                    </Link>
-                    <Link href="/dashboard/history" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center group-hover:bg-emerald-500/15 transition-all"><History className="w-4 h-4 text-emerald-400" /></div>
-                        <span className="text-sm font-medium">History</span>
-                    </Link>
-                    <Link href="/dashboard/onsite" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/15 transition-all"><Building2 className="w-4 h-4 text-amber-400" /></div>
-                        <span className="text-sm font-medium">Virtual Onsite</span>
-                    </Link>
-                    <Link href="/dashboard/leaderboard" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500/15 transition-all"><Trophy className="w-4 h-4 text-amber-400" /></div>
-                        <span className="text-sm font-medium">Leaderboard</span>
-                    </Link>
-                    <Link href="/dashboard/analytics" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-orange-500/10 flex items-center justify-center group-hover:bg-orange-500/15 transition-all"><TrendingUp className="w-4 h-4 text-orange-400" /></div>
-                        <span className="text-sm font-medium">Analytics</span>
-                    </Link>
-                    <Link href="/dashboard/resources" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-teal-500/10 flex items-center justify-center group-hover:bg-teal-500/15 transition-all"><BookOpen className="w-4 h-4 text-teal-400" /></div>
-                        <span className="text-sm font-medium">Learning Library</span>
-                    </Link>
-                    <Link href="/dashboard/settings" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
-                        <div className="w-8 h-8 rounded-lg bg-zinc-500/10 flex items-center justify-center group-hover:bg-zinc-500/15 transition-all"><Settings className="w-4 h-4 text-zinc-400" /></div>
-                        <span className="text-sm font-medium">Settings</span>
-                    </Link>
-                </nav>
-                <div className="p-4 border-t border-white/5 space-y-4">
-                    {/* XP Progress Bar */}
-                    <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-2">
-                        <div className="flex justify-between items-center">
-                            <span className="text-[10px] font-medium text-zinc-500">Level {user.level || 1}</span>
-                            <span className="text-[10px] font-semibold text-indigo-400">{user.xp || 0} / {((user.level || 1) * 500)} XP</span>
-                        </div>
-                        <div className="h-1.5 bg-white/5 rounded-full overflow-hidden">
-                            <motion.div
-                                className="h-full bg-gradient-to-r from-indigo-500 to-teal-500 rounded-full"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${Math.min(((user.xp || 0) / ((user.level || 1) * 500)) * 100, 100)}%` }}
-                                transition={{ duration: 1.5, ease: "circOut" }}
-                            />
-                        </div>
-                        <div className="flex items-center gap-2">
-                            <Award className="w-3 h-3 text-amber-400" />
-                            <span className="text-[10px] font-medium text-amber-400/80">{user.rank || 'Rookie'}</span>
-                        </div>
-                    </div>
-
-                    <div className="flex items-center gap-3 px-3">
-                        <NotificationCenter />
-                        <div className="h-6 w-[1px] bg-white/10" />
-                        <button
-                            onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
-                            className="flex-1 flex items-center gap-3 px-3 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-left group/cmd"
-                        >
-                            <Search className="w-4 h-4 text-zinc-500 group-hover/cmd:text-primary transition-colors" />
-                            <span className="text-xs text-zinc-500 flex-1">Quick Search...</span>
-                            <kbd className="px-1.5 py-0.5 rounded bg-white/5 border border-white/10 text-[9px] font-black text-zinc-500">⌘K</kbd>
-                        </button>
-                    </div>
-
-                    {user.subscriptionStatus !== 'pro' && (
-                        <Link href="/pricing">
-                            <Card className="bg-gradient-to-br from-indigo-500/10 to-teal-500/5 border-indigo-500/20 p-4 hover:border-indigo-400/30 transition-all group/pro">
-                                <div className="flex items-center gap-2 mb-2">
-                                    <Sparkles className="w-4 h-4 text-indigo-400" />
-                                    <span className="text-xs font-semibold text-indigo-300">Upgrade to Pro</span>
-                                </div>
-                                <p className="text-xs text-zinc-400 mb-3">Unlock <span className="text-indigo-400 font-medium">unlimited interviews</span> & detailed reports.</p>
-                                <Button size="sm" className="w-full bg-gradient-to-r from-indigo-500 to-teal-500 text-white hover:from-indigo-400 hover:to-teal-400 font-semibold text-xs">
-                                    Go Pro ✨
-                                </Button>
-                            </Card>
+            <motion.aside
+                initial={false}
+                animate={{
+                    width: isDesktopSidebarOpen ? 256 : 0,
+                    opacity: isDesktopSidebarOpen ? 1 : 0
+                }}
+                transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+                className={`shrink-0 bg-zinc-950/80 backdrop-blur-xl border-white/5 hidden md:flex flex-col sticky top-0 h-screen z-20 overflow-x-hidden ${isDesktopSidebarOpen ? 'border-r custom-scrollbar overflow-y-auto shadow-2xl' : 'border-none overflow-y-hidden pointer-events-none'}`}
+            >
+                <div className="w-64 flex flex-col h-full min-h-screen">
+                    <div className="p-6 pb-2 flex items-center justify-between">
+                        <Link href="/dashboard" className="flex items-center group">
+                            <Logo size={36} showText showStatus />
                         </Link>
-                    )}
-                    <Button variant="ghost" className="w-full justify-start gap-3 text-zinc-500 hover:text-white hover:bg-white/5" onClick={handleLogout}>
-                        <LogOut className="w-5 h-5" />
-                        <span>Logout</span>
-                    </Button>
+                        <Button variant="ghost" size="icon" onClick={toggleDesktopSidebar} className="text-zinc-500 hover:text-white h-8 w-8 shrink-0 transition-all">
+                            <PanelLeftClose className="w-4 h-4" />
+                        </Button>
+                    </div>
+
+                    {/* User Profile Card */}
+                    <div className="mx-4 mb-6 mt-4 p-4 rounded-xl bg-white/[0.03] border border-white/[0.06] relative overflow-hidden group/profile shadow-xl">
+                        <div className="flex items-center gap-3 mb-3 relative z-10">
+                            <div className="relative w-10 h-10 rounded-xl overflow-hidden bg-indigo-500/10 flex items-center justify-center shadow-inner">
+                                <User className="w-5 h-5 text-indigo-400" />
+                            </div>
+                            <div className="min-w-0">
+                                <p className="text-sm font-semibold text-zinc-200 truncate tracking-tight">{user.username || 'Candidate'}</p>
+                                <div className="flex items-center gap-1.5 mt-0.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]" />
+                                    <span className="text-[10px] text-emerald-400/80">Active</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p className="text-[10px] text-zinc-500 font-medium relative z-10">Welcome back! Keep up the momentum.</p>
+                    </div>
+
+                    <nav className="flex-1 px-4 space-y-1">
+                        {[
+                            { href: "/dashboard", icon: <User className="w-4 h-4 text-white" />, label: "Dashboard", active: true },
+                            { href: "/dashboard/cv-builder", icon: <FileText className="w-4 h-4 text-cyan-400" />, label: "CV Builder", bgGroup: "bg-cyan-500" },
+                            { href: "/dashboard/portfolio-builder", icon: <Sparkles className="w-4 h-4 text-purple-400" />, label: "Portfolio", bgGroup: "bg-purple-500" },
+                            { href: "/dashboard/roadmap", icon: <Map className="w-4 h-4 text-amber-500" />, label: "Roadmap", bgGroup: "bg-amber-500" },
+                            { href: "/dashboard/feynman", icon: <Brain className="w-4 h-4 text-blue-400" />, label: "Explainer", bgGroup: "bg-blue-500" },
+                            { href: "/dashboard/resume", icon: <Target className="w-4 h-4 text-emerald-400" />, label: "Optimizer", bgGroup: "bg-emerald-500" },
+                            { href: "/dashboard/code", icon: <Terminal className="w-4 h-4 text-blue-400" />, label: "Coding Hub", bgGroup: "bg-blue-500" },
+                            { href: "/dashboard/technical/details", icon: <Brain className="w-4 h-4 text-purple-400" />, label: "Round Prep", bgGroup: "bg-purple-500" },
+                            { href: "/dashboard/advanced-notes", icon: <PenTool className="w-4 h-4 text-rose-400" />, label: "Advanced Notes", bgGroup: "bg-rose-500" },
+                            { href: "/dashboard/pomodoro", icon: <Coffee className="w-4 h-4 text-orange-400" />, label: "Pomodoro Hub", bgGroup: "bg-orange-500" },
+                            { href: "/dashboard/leaderboard", icon: <Trophy className="w-4 h-4 text-amber-400" />, label: "Leaderboard", bgGroup: "bg-amber-500" },
+                            { href: "/dashboard/analytics", icon: <TrendingUp className="w-4 h-4 text-zinc-400" />, label: "Performance", bgGroup: "bg-zinc-500" },
+                        ]
+                            .map(item => item.active ? (
+                                <Link key={item.href} href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-indigo-500/15 to-teal-500/10 border border-indigo-500/15 transition-all shadow-lg group">
+                                    <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-teal-500 flex items-center justify-center shadow-lg">{item.icon}</div>
+                                    <span className="text-sm font-semibold text-indigo-300">{item.label}</span>
+                                </Link>
+                            ) : (
+                                <Link key={item.href} href={item.href} className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-white/5 transition-all text-zinc-400 hover:text-white group">
+                                    <div className={`w-8 h-8 rounded-lg ${item.bgGroup}/10 border border-white/5 flex items-center justify-center group-hover:border-white/10 transition-all shadow-inner`}>{item.icon}</div>
+                                    <span className="text-sm font-medium">{item.label}</span>
+                                </Link>
+                            ))}
+                    </nav>
+
+                    <div className="p-4 border-t border-white/5 space-y-4">
+                        {/* AmitAI Coins Progress */}
+                        <div className="p-3 rounded-xl bg-white/[0.03] border border-white/[0.06] space-y-2 shadow-inner">
+                            <div className="flex justify-between items-center">
+                                <span className="text-[10px] font-black uppercase tracking-widest text-zinc-500">Status</span>
+                                <div className="flex items-center gap-1 text-[10px] font-bold text-yellow-500">
+                                    <span>{(user.amitaiCoins || 0).toLocaleString()}</span>
+                                    <AmitAICoin size={12} animate={false} glow={false} />
+                                </div>
+                            </div>
+                            <div className="h-1.5 bg-zinc-950 rounded-full overflow-hidden border border-white/5">
+                                <motion.div
+                                    className="h-full bg-gradient-to-r from-yellow-500 to-amber-600 rounded-full shadow-[0_0_10px_rgba(234,179,8,0.3)]"
+                                    initial={{ width: 0 }}
+                                    animate={{ width: `${Math.min(((user.amitaiCoins || 0) / ((user.level || 1) * 2000)) * 100, 100)}%` }}
+                                    transition={{ duration: 1.5, ease: "circOut" }}
+                                />
+                            </div>
+                            <p className="text-[9px] text-zinc-600 font-medium">Rank {user.level || 1} • Champion</p>
+                        </div>
+
+                        <div className="flex items-center gap-3 px-3">
+                            <NotificationCenter />
+                            <div className="h-6 w-[1px] bg-white/10" />
+                            <button
+                                onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'k', ctrlKey: true }))}
+                                className="flex-1 h-10 flex items-center gap-3 px-3 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all text-left shadow-inner group/cmd"
+                            >
+                                <Search className="w-4 h-4 text-zinc-500 group-hover/cmd:text-primary transition-colors" />
+                                <span className="text-[10px] text-zinc-500 flex-1">Vault Search</span>
+                                <kbd className="hidden sm:inline-flex px-1.5 py-0.5 rounded bg-zinc-950 border border-white/10 text-[9px] font-black text-zinc-600">⌘K</kbd>
+                            </button>
+                        </div>
+
+                        <Button variant="ghost" className="w-full h-12 justify-start gap-3 text-zinc-500 hover:text-white hover:bg-white/5 rounded-xl px-4" onClick={handleLogout}>
+                            <LogOut className="w-5 h-5" />
+                            <span>Logout</span>
+                        </Button>
+                    </div>
                 </div>
+            </motion.aside>
 
-                {/* Sidebar footer */}
-                <div className="mt-auto border-t border-white/5 px-6 py-3">
-                    <p className="text-[10px] text-zinc-600 text-center">AMITAI Interview v2.0</p>
-                </div>
-            </aside>
+            {/* Main Architectural Hub */}
+            <main className="flex-1 min-w-0 transition-all duration-500 bg-slate-950 relative">
+                <div className="max-w-[1700px] mx-auto px-8 md:px-16 py-12 md:py-24 space-y-16 md:space-y-24 pb-32">
 
-            {/* Main Content */}
-            <main className="flex-1 pt-14 md:pt-0 aurora-glow">
-                <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 lg:px-10 py-4 sm:py-6 md:py-10 space-y-12 sm:space-y-16 relative">
-
-                    {/* Floating ambient orbs */}
-                    <div className="absolute top-20 left-10 w-72 h-72 bg-violet-500/5 rounded-full blur-[120px] orb-float pointer-events-none" />
-                    <div className="absolute top-[40%] right-10 w-64 h-64 bg-cyan-500/5 rounded-full blur-[100px] orb-float pointer-events-none" style={{ animationDelay: '2s' }} />
-                    <div className="absolute bottom-20 left-1/3 w-80 h-80 bg-pink-500/4 rounded-full blur-[140px] orb-float pointer-events-none" style={{ animationDelay: '4s' }} />
-                    {/* Welcome Header */}
+                    {/* Operational Core: Strategic HUD */}
                     <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6 }}
+                        initial={{ opacity: 0, scale: 0.99 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ duration: 0.8 }}
+                        className="grid lg:grid-cols-12 gap-8 items-stretch"
                     >
-                        <div className="grid lg:grid-cols-3 gap-8">
-                            <div className="lg:col-span-2">
-                                <SarahBriefing user={user} stats={stats} />
-                            </div>
-                            <div>
-                                <ActivityTimeline userId={user._id} />
-                            </div>
+                        <div className="lg:col-span-8 flex">
+                            <SarahBriefing user={user} stats={stats} />
+                        </div>
+                        <div className="lg:col-span-4 flex">
+                            <ActivityTimeline userId={user._id} />
                         </div>
                     </motion.div>
 
-                    {/* Streak Flame */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.08 }}
-                    >
-                        <StreakFlame user={user} />
-                    </motion.div>
+                    {/* Operational Metrics Segment */}
+                    <div className="space-y-12">
+                        <div className="flex items-center gap-8">
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                            <span className="text-[11px] font-bold uppercase tracking-[0.4em] text-zinc-500">System Performance</span>
+                            <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent via-white/5 to-transparent" />
+                        </div>
 
-                    {/* ── Section Divider ──────────────── */}
-                    <div className="section-divider" />
+                        <div className="grid lg:grid-cols-12 gap-8 items-stretch">
+                            <div className="lg:col-span-4 flex">
+                                <div className="w-full bg-gradient-to-br from-indigo-500/10 to-teal-500/5 rounded-3xl p-8 border border-white/5 flex flex-col justify-center items-center text-center">
+                                    <AmitAICoin size={80} glow animate />
+                                    <h3 className="text-xl font-black mt-4 text-white">Elite Rewards</h3>
+                                    <p className="text-sm text-zinc-500 mt-2">Earn AmitAI Coins to unlock premium mentorship</p>
+                                </div>
+                            </div>
+                            <div className="lg:col-span-8 flex">
+                                <DailyGoals />
+                            </div>
+                        </div>
+                    </div>
 
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                    >
-                        <GamificationPanel user={user} />
-                    </motion.div>
+                    {/* Real-time Metric Hud */}
+                    <LiveStatsBar user={user} stats={stats} />
 
-                    {/* Daily Goals Section */}
-                    <motion.section
-                        initial={{ opacity: 0, y: 30 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.8, delay: 0.2 }}
-                    >
-                        <DailyGoals />
-                    </motion.section>
-
-                    {/* ── Section Divider ──────────────── */}
-                    <div className="section-divider" />
-
-                    {/* Live Stats Bar */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.5, delay: 0.25 }}
-                    >
-                        <LiveStatsBar stats={stats} user={user} />
-                    </motion.div>
+                    {/* Strategic Alignment Sections */}
+                    <div className="bg-white/[0.02] border border-white/5 rounded-3xl p-8 md:p-12 shadow-2xl">
+                        <HiringPartners />
+                    </div>
 
                     {/* Readiness, Skills, Focus & Weakness Grid */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-                        <motion.div
-                            initial={{ opacity: 0, x: -30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.3 }}
-                        >
-                            <ReadinessGauge />
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ duration: 0.5, delay: 0.35 }}
-                        >
-                            <SkillRadar />
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, x: 30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.4 }}
-                        >
-                            <StudyTimer />
-                        </motion.div>
-                        <motion.div
-                            initial={{ opacity: 0, x: 30 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ duration: 0.5, delay: 0.45 }}
-                        >
-                            <WeaknessRadar />
-                        </motion.div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 md:gap-8">
+                        <ReadinessGauge />
+                        <SkillRadar />
+                        <StudyTimer />
+                        <WeaknessRadar />
+                    </div>
+
+                    {/* System Gamification Matrix */}
+                    <div className="bg-zinc-950/50 border border-white/5 rounded-3xl p-8 md:p-12 shadow-2xl">
+                        <GamificationPanel user={user} />
                     </div>
 
                     {/* ── Section Divider ──────────────── */}
@@ -527,6 +530,24 @@ export default function DashboardPage() {
                                 </Card>
                             </Link>
 
+                            <Link href="/dashboard/advanced-notes">
+                                <TiltCard className="h-full">
+                                    <Card className="group relative overflow-hidden rounded-2xl bg-zinc-900/30 backdrop-blur-xl border border-white/[0.06] p-6 hover:bg-white/[0.04] hover:border-rose-400/25 transition-all duration-500 cursor-pointer h-full hover-shine">
+                                        <span className="absolute top-4 right-4 px-2.5 py-0.5 text-[10px] font-semibold bg-rose-500/20 text-rose-300 rounded-full z-20">
+                                            New
+                                        </span>
+                                        <div className="absolute inset-0 bg-gradient-to-br from-rose-500/[0.03] to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                                        <div className="relative z-10">
+                                            <div className="w-12 h-12 rounded-xl bg-rose-500/10 flex items-center justify-center text-rose-400 mb-4 group-hover:scale-105 transition-all duration-500">
+                                                <PenTool className="w-5 h-5" />
+                                            </div>
+                                            <h3 className="text-lg font-semibold mb-2"><span className="text-rose-400">Advanced</span> Notes</h3>
+                                            <p className="text-sm text-zinc-400 group-hover:text-zinc-300 transition-colors">AI-powered smart writing with hand gestures</p>
+                                        </div>
+                                    </Card>
+                                </TiltCard>
+                            </Link>
+
                             <Link href="/dashboard/history">
                                 <TiltCard className="h-full">
                                     <Card className="group relative overflow-hidden rounded-2xl bg-zinc-900/30 backdrop-blur-xl border border-white/[0.06] p-6 hover:bg-white/[0.04] hover:border-emerald-400/25 transition-all duration-500 cursor-pointer h-full hover-shine">
@@ -585,6 +606,19 @@ export default function DashboardPage() {
                         transition={{ duration: 0.5 }}
                     >
                         <InterviewSimPreview />
+                    </motion.section>
+
+                    {/* ── Section Divider ──────────────── */}
+                    <div className="section-divider" />
+
+                    {/* NEW CAREER GROWTH HUB */}
+                    <motion.section
+                        initial={{ opacity: 0, y: 40 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, amount: 0.1 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <CareerGrowthHub />
                     </motion.section>
 
                     {/* ── Section Divider ──────────────── */}

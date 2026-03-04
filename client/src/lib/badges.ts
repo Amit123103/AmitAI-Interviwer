@@ -1,9 +1,10 @@
-import { Flame, Calendar, Trophy, Award, CheckCircle2, User, Zap, Briefcase, Moon, Sun, Shield } from "lucide-react"
+import { Calendar, Trophy, Award, CheckCircle2, User, Moon, Sun, Shield, Sparkles, Briefcase } from "lucide-react"
+import AmitAICoin from "@/components/reward-system/AmitAICoin"
 
 export const BADGES: Record<string, any> = {
     first_step: { id: 'first_step', name: 'First Step', description: 'Completed your first interview', icon: 'footprints' },
-    hat_trick: { id: 'hat_trick', name: 'Hat Trick', description: 'Achieved a 3-day streak', icon: 'flame' },
-    on_fire: { id: 'on_fire', name: 'On Fire', description: 'Achieved a 7-day streak', icon: 'zap' },
+    wealthy: { id: 'wealthy', name: 'Wealthy', description: 'Earned 1,000 AmitAI Coins', icon: 'coin' },
+    coin_king: { id: 'coin_king', name: 'Coin King', description: 'Earned 5,000 AmitAI Coins', icon: 'sparkles' },
     marathon: { id: 'marathon', name: 'Marathoner', description: 'Completed 10 interviews', icon: 'trophy' },
     code_ninja: { id: 'code_ninja', name: 'Code Ninja', description: 'Wrote over 1000 lines of code', icon: 'code' },
     night_owl: { id: 'night_owl', name: 'Night Owl', description: 'Completed an interview after 10 PM', icon: 'moon' },
@@ -14,8 +15,8 @@ export const BADGES: Record<string, any> = {
 }
 
 export const BADGE_ICONS: Record<string, any> = {
-    'flame': Flame,
-    'zap': Zap,
+    'coin': AmitAICoin,
+    'sparkles': Sparkles,
     'trophy': Trophy,
     'code': User, // Lucide 'code' icon or User as fallback if not imported? I imported User, but looking for Code. 
     // Wait, I should import Code from lucide-react if I use it.

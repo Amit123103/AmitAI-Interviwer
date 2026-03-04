@@ -113,6 +113,10 @@ import contentRoutes from './routes/contentRoutes'
 import adminRoutes from './routes/adminRoutes'
 import proSubscriptionRoutes from './routes/proSubscriptionRoutes'
 import sqlRoutes from './routes/sqlRoutes'
+import portfolioRoutes from './routes/portfolioRoutes'
+import advancedNotesRoutes from './routes/advancedNotesRoutes'
+import notesOcrRoutes from './routes/notesOcrRoutes'
+import mentorRoutes from './routes/mentorRoutes'
 
 app.use('/api/auth', authLimiter, authRoutes);   // Stricter limit on auth
 app.use('/api/profile', profileRoutes);
@@ -140,6 +144,10 @@ app.use('/api/questions', questionRoutes);
 app.use('/api/companies', companyRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/pro', uploadLimiter, proSubscriptionRoutes);
+app.use('/api/portfolio', portfolioRoutes);
+app.use('/api/notes', advancedNotesRoutes);
+app.use('/api/notes', notesOcrRoutes);
+app.use('/api/mentor', mentorRoutes);
 
 // ── Socket.IO ───────────────────────────────────────────────────────
 import { initializeSocket } from './socket/index';

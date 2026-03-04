@@ -10,31 +10,26 @@ interface SarahBriefingProps {
 }
 
 export default function SarahBriefing({ user, stats }: SarahBriefingProps) {
-    const greeting = useMemo(() => {
+    const greetingBase = useMemo(() => {
         const hour = new Date().getHours()
         if (hour < 12) return "Good morning"
         if (hour < 17) return "Good afternoon"
         return "Good evening"
     }, [])
 
+    const slogan = useMemo(() => {
+        const slogans = [
+            "Tech Visionary",
+            "Future Builder",
+            "Placement Pioneer",
+            "Architect of Tomorrow"
+        ]
+        return slogans[Math.floor(Math.random() * slogans.length)]
+    }, [])
+
     const briefing = useMemo(() => {
-        if (!stats) return "Ready for another practice session? Let's pick up where you left off."
-
-        const latestScore = stats.progressData?.[stats.progressData.length - 1]?.technical || 0
-        const commScore = stats.progressData?.[stats.progressData.length - 1]?.communication || 0
-
-        if (latestScore > 85 && commScore > 85) {
-            return "You're performing exceptionally well across the board! Try a high-pressure stress test or a mock leadership interview next."
-        } else if (latestScore > 80) {
-            return "Your technical skills are solid. Let's shift focus to system design or architectural scalability today."
-        } else if (commScore < 60 && latestScore > 0) {
-            return "Great technical skills! Your communication score could use some work — try an 'Articulating Complex Ideas' session today."
-        } else if (latestScore > 0 && latestScore < 65) {
-            return "Nice effort! Let's drill into your weak areas. We've lined up a DS & Algorithms review for you."
-        }
-
-        return "Welcome! We've analyzed your profile and prepared a personalized roadmap to help you ace your next big role."
-    }, [stats])
+        return "Stay consistent. Your future self will thank you."
+    }, [])
 
     const nextAction = useMemo(() => {
         if (!stats) return { label: "System Design", area: "Scalability" }
@@ -57,93 +52,134 @@ export default function SarahBriefing({ user, stats }: SarahBriefingProps) {
     }, [stats])
 
     return (
-        <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="relative overflow-hidden group"
-        >
-            <div className="bg-zinc-950/40 backdrop-blur-3xl border border-white/10 rounded-2xl p-8 md:p-10 flex flex-col md:flex-row gap-8 items-start md:items-center shadow-2xl relative overflow-hidden">
-                {/* Rainbow accent bar */}
-                <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-rose-500 via-amber-500 via-emerald-500 via-blue-500 to-violet-500" />
+        <div className="relative w-full h-full">
+            <div className="neural-card p-10 md:p-12 lg:p-14 h-full bg-slate-900/40 backdrop-blur-2xl border border-white/5 shadow-2xl group overflow-visible">
 
-                {/* Subtle background glow */}
-                <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.06] transition-opacity pointer-events-none">
-                    <Sun size={120} />
-                </div>
+                {/* Responsive Grid Flow - No Overlap */}
+                <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
 
-                {/* Avatar / Icon */}
-                <div className="w-20 h-20 md:w-24 md:h-24 rounded-2xl bg-gradient-to-br from-indigo-500/20 to-violet-500/20 border border-indigo-500/20 flex items-center justify-center shrink-0 relative group-hover:border-indigo-400/40 transition-colors">
-                    <div className="text-4xl md:text-5xl select-none">👋</div>
-                </div>
-
-                <div className="flex-1 space-y-4">
-                    <div className="flex items-center gap-3 flex-wrap">
-                        <div className="flex items-center gap-2 px-3 py-1.5 bg-indigo-500/10 rounded-lg border border-indigo-500/20">
-                            <Sparkles className="w-3.5 h-3.5 text-indigo-400" />
-                            <span className="text-xs font-semibold text-indigo-300">Your daily brief</span>
+                    {/* Visual Anchor (Col 1-2) */}
+                    <div className="lg:col-span-2 flex justify-center lg:justify-start">
+                        <div className="relative">
+                            <motion.div
+                                className="w-28 h-28 md:w-32 md:h-32 rounded-[1.5rem] bg-slate-900/50 border border-white/10 flex items-center justify-center shadow-xl relative z-10 overflow-hidden"
+                                whileHover={{ rotate: 5, scale: 1.05 }}
+                            >
+                                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-transparent" />
+                                <motion.div
+                                    className="text-6xl md:text-7xl select-none"
+                                    animate={{ rotate: [0, 10, -10, 0] }}
+                                    transition={{ duration: 2.5, repeat: Infinity }}
+                                >
+                                    👋
+                                </motion.div>
+                            </motion.div>
+                            <div className="absolute -inset-2 bg-blue-500/10 blur-2xl rounded-full opacity-30" />
                         </div>
-                        {(user?.streak || 0) > 3 && (
-                            <div className="flex items-center gap-1.5 px-2.5 py-1 bg-amber-500/10 rounded-lg border border-amber-500/20">
-                                <Trophy className="w-3 h-3 text-amber-400" />
-                                <span className="text-[11px] font-semibold text-amber-300">{user.streak}-day streak!</span>
+                    </div>
+
+                    {/* Main Content (Col 3-8) */}
+                    <div className="lg:col-span-6 space-y-8">
+                        <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-2 px-4 py-1.5 bg-blue-500/10 rounded-full border border-blue-500/20">
+                                <div className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+                                <span className="text-[10px] font-bold uppercase tracking-widest text-blue-500">Learning System Synced</span>
                             </div>
-                        )}
+                        </div>
+
+                        <div className="space-y-4">
+                            <div className="space-y-1">
+                                <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight leading-tight">
+                                    {greetingBase}, <span className="text-blue-500">{user?.username || "Amit"}</span>
+                                </h2>
+                                <p className="text-sm md:text-base font-bold text-blue-500/60 tracking-[0.2em] uppercase">
+                                    {slogan}
+                                </p>
+                            </div>
+                            <p className="text-slate-400 text-base md:text-lg font-medium leading-relaxed max-w-xl">
+                                Your progress is on track. <br />
+                                <span className="text-white/70 italic">Stay consistent. Your future self will thank you.</span>
+                            </p>
+                        </div>
+
+                        {/* Integrated Milestone Hud */}
+                        <div className="p-7 rounded-[1.5rem] bg-white/[0.02] border border-white/5 hover:border-blue-500/30 transition-all group/ms relative overflow-hidden">
+                            <div className="flex items-center gap-4 mb-6">
+                                <div className="w-12 h-12 rounded-xl bg-blue-500/10 border border-blue-500/20 flex items-center justify-center group-hover/ms:bg-blue-500/20 transition-colors">
+                                    <Zap className="w-6 h-6 text-blue-500" />
+                                </div>
+                                <div className="flex flex-col">
+                                    <span className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">Current Milestone</span>
+                                    <span className="text-white text-lg font-bold tracking-tight">Master Tech Fundamentals</span>
+                                </div>
+                            </div>
+
+                            <div className="space-y-4">
+                                <div className="h-2 w-full bg-slate-950 rounded-full overflow-hidden p-0.5 border border-white/5 shadow-inner">
+                                    <motion.div
+                                        className="h-full bg-gradient-to-r from-blue-500 to-indigo-400 rounded-full shadow-[0_0_10px_rgba(59,130,246,0.3)]"
+                                        initial={{ width: 0 }}
+                                        animate={{ width: "65%" }}
+                                        transition={{ duration: 2 }}
+                                    />
+                                </div>
+                                <div className="flex justify-between items-center text-[10px] font-bold uppercase tracking-widest">
+                                    <div className="flex flex-col">
+                                        <span className="text-blue-500">65% Completed</span>
+                                    </div>
+                                    <div className="flex flex-col items-end">
+                                        <span className="text-slate-500">Est. 2h 15m remaining</span>
+                                    </div>
+                                </div>
+                                <button className="w-full py-3.5 rounded-2xl bg-blue-600 text-white text-[11px] font-bold uppercase tracking-widest hover:bg-blue-500 transition-all shadow-lg active:scale-[0.98]">
+                                    Continue Learning →
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
-                    <h2 className="text-2xl md:text-3xl font-bold text-white leading-tight max-w-3xl tracking-tight">
-                        {greeting}, <span className="bg-gradient-to-r from-indigo-400 to-violet-400 bg-clip-text text-transparent">{user?.username || "there"}</span>! {briefing}
-                    </h2>
+                    {/* Stats HUD (Col 9-12) - Integrated & Visible */}
+                    <div className="lg:col-span-4 space-y-6 lg:pl-10 lg:border-l lg:border-white/5 self-center">
+                        <div className="space-y-6 p-6 rounded-[2rem] bg-white/[0.01] border border-white/5">
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-end">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Skill Alignment</span>
+                                        <span className="text-2xl font-bold text-white">{overallProgress}%</span>
+                                    </div>
+                                    <Trophy className="w-5 h-5 text-blue-500/50" />
+                                </div>
+                                <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.4)]"
+                                        style={{ width: `${overallProgress}%` }}
+                                    />
+                                </div>
+                            </div>
 
-                    <div className="flex flex-wrap gap-5 pt-1">
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
-                            <Zap className="w-4 h-4 text-amber-500" />
-                            Up next: <span className="text-white font-semibold">{nextAction.label}</span>
-                        </div>
-                        <div className="flex items-center gap-2 text-sm text-zinc-400">
-                            <Target className="w-4 h-4 text-emerald-500" />
-                            Focus area: <span className="text-white font-semibold">{nextAction.area}</span>
-                        </div>
-                    </div>
-                </div>
+                            <div className="space-y-4">
+                                <div className="flex justify-between items-end">
+                                    <div className="flex flex-col">
+                                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Role Readiness</span>
+                                        <span className="text-2xl font-bold text-white">{confidenceScore}%</span>
+                                    </div>
+                                    <Target className="w-5 h-5 text-blue-500/50" />
+                                </div>
+                                <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden">
+                                    <div
+                                        className="h-full bg-blue-500 rounded-full shadow-[0_0_8px_rgba(59,130,246,0.4)]"
+                                        style={{ width: `${confidenceScore}%` }}
+                                    />
+                                </div>
+                            </div>
 
-                {/* Progress bars */}
-                <div className="hidden lg:flex flex-col items-start gap-4 pl-10 border-l border-white/10 min-w-[240px]">
-                    <div className="space-y-1.5 w-full">
-                        <div className="flex justify-between items-end">
-                            <span className="text-xs font-medium text-zinc-400">Overall Progress</span>
-                            <span className="text-sm font-bold text-indigo-400">{overallProgress}%</span>
+                            <div className="pt-4 border-t border-white/5 text-[10px] font-bold uppercase tracking-[0.2em] text-center text-emerald-500">
+                                Placement Ready
+                            </div>
                         </div>
-                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                            <motion.div
-                                className="h-full bg-gradient-to-r from-indigo-500 to-violet-500 rounded-full"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${overallProgress}%` }}
-                                transition={{ duration: 1.5 }}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="space-y-1.5 w-full">
-                        <div className="flex justify-between items-end">
-                            <span className="text-xs font-medium text-zinc-400">Confidence Score</span>
-                            <span className="text-sm font-bold text-emerald-400">{confidenceScore}%</span>
-                        </div>
-                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
-                            <motion.div
-                                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
-                                initial={{ width: 0 }}
-                                animate={{ width: `${confidenceScore}%` }}
-                                transition={{ duration: 1.5 }}
-                            />
-                        </div>
-                    </div>
-
-                    <div className="pt-1 w-full flex justify-between items-center">
-                        <span className="text-[11px] text-zinc-500 font-medium">Updated just now</span>
-                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                     </div>
                 </div>
             </div>
-        </motion.div>
+        </div>
     )
 }

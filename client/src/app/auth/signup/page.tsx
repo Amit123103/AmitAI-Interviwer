@@ -9,40 +9,8 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mail, Lock, User as UserIcon, ShieldCheck, ArrowRight, ArrowLeft, Sparkles, Fingerprint, Zap, Eye, EyeOff, CheckCircle2, Circle, Shield, Wifi, PartyPopper } from "lucide-react"
-import MeshBackground from "../../dashboard/components/MeshBackground"
 import axios from "axios"
 
-/* ── Animated floating particle ── */
-function FloatingParticle({ delay, size, color, x, y }: { delay: number; size: number; color: string; x: string; y: string }) {
-    return (
-        <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: [0, 0.6, 0], scale: [0, 1, 0] }}
-            transition={{ delay, duration: 4 + Math.random() * 3, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute pointer-events-none"
-            style={{ left: x, top: y }}
-        >
-            <div className="rounded-full blur-[1px]" style={{ width: size, height: size, background: color }} />
-        </motion.div>
-    )
-}
-
-/* ── Animated gradient ring ── */
-function GradientRing() {
-    return (
-        <div className="absolute inset-0 pointer-events-none overflow-hidden rounded-[2.5rem]">
-            <motion.div
-                animate={{ rotate: 360 }}
-                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-                className="absolute -inset-[1px] rounded-[2.5rem]"
-                style={{
-                    background: "conic-gradient(from 0deg, transparent 0%, #7c3aed 10%, transparent 20%, #f43f5e 30%, transparent 40%, #f59e0b 50%, transparent 60%, #10b981 70%, transparent 80%, #06b6d4 90%, transparent 100%)",
-                    opacity: 0.12,
-                }}
-            />
-        </div>
-    )
-}
 
 /* ── Password requirement item ── */
 function RequirementItem({ met, label }: { met: boolean; label: string }) {
@@ -115,8 +83,8 @@ export default function SignupPage() {
         setLoading(true)
         try {
             await axios.post(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001'}/api/auth/register`, {
-                username: formData.username,
-                email: formData.email,
+                username: formData.username.trim(),
+                email: formData.email.trim(),
                 password: formData.password,
             })
             setSignupSuccess(true)
@@ -129,48 +97,7 @@ export default function SignupPage() {
     }
 
     return (
-        <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 overflow-hidden bg-[#030305]">
-            <MeshBackground variant="auth" />
-
-            {/* ── Ambient color blobs ── */}
-            <div className="absolute top-[5%] right-[5%] w-[500px] h-[500px] bg-purple-600/[0.06] rounded-full blur-[150px] animate-pulse" />
-            <div className="absolute bottom-[5%] left-[5%] w-[400px] h-[400px] bg-rose-500/[0.05] rounded-full blur-[130px]" />
-            <div className="absolute top-[50%] left-[20%] w-[300px] h-[300px] bg-amber-500/[0.04] rounded-full blur-[120px]" />
-            <div className="absolute bottom-[30%] right-[15%] w-[250px] h-[250px] bg-cyan-500/[0.04] rounded-full blur-[100px]" />
-
-            {/* ── Floating particles ── */}
-            <FloatingParticle delay={0} size={4} color="#7c3aed" x="10%" y="25%" />
-            <FloatingParticle delay={1.5} size={3} color="#f43f5e" x="85%" y="20%" />
-            <FloatingParticle delay={0.7} size={5} color="#f59e0b" x="75%" y="65%" />
-            <FloatingParticle delay={2.2} size={3} color="#06b6d4" x="15%" y="80%" />
-            <FloatingParticle delay={1.0} size={4} color="#10b981" x="90%" y="50%" />
-            <FloatingParticle delay={0.3} size={3} color="#ec4899" x="50%" y="8%" />
-
-            {/* ── Grid overlay ── */}
-            <div
-                className="absolute inset-0 opacity-[0.03] pointer-events-none"
-                style={{
-                    backgroundImage: "linear-gradient(rgba(139,92,246,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(139,92,246,0.3) 1px, transparent 1px)",
-                    backgroundSize: "60px 60px",
-                }}
-            />
-
-            {/* ── Side accent lines ── */}
-            <motion.div
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 2, delay: 0.3 }}
-                className="absolute left-[4%] top-[5%] w-px h-[90%] origin-top hidden xl:block"
-                style={{ background: "linear-gradient(to bottom, transparent, rgba(139,92,246,0.3), rgba(244,63,94,0.2), transparent)" }}
-            />
-            <motion.div
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 2, delay: 0.6 }}
-                className="absolute right-[4%] top-[10%] w-px h-[80%] origin-top hidden xl:block"
-                style={{ background: "linear-gradient(to bottom, transparent, rgba(6,182,212,0.3), rgba(245,158,11,0.2), transparent)" }}
-            />
-
+        <div className="relative min-h-screen flex items-center justify-center p-4 sm:p-6 bg-zinc-950">
             <motion.div
                 initial={{ opacity: 0, scale: 0.92, y: 30 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -190,8 +117,7 @@ export default function SignupPage() {
                     </div>
                     <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-600 group-hover:text-zinc-400 transition-colors duration-300">Back</span>
                 </motion.button>
-                <Card className="bg-white/[0.03] backdrop-blur-3xl border border-white/[0.08] shadow-[0_0_80px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)] rounded-[2.5rem] overflow-hidden relative">
-                    <GradientRing />
+                <Card className="bg-zinc-900/40 backdrop-blur-3xl border border-white/[0.08] shadow-[0_0_80px_rgba(0,0,0,0.5),inset_0_1px_0_rgba(255,255,255,0.05)] rounded-[2.5rem] overflow-hidden relative">
                     <div className="absolute inset-0 bg-gradient-to-br from-purple-500/[0.04] via-transparent to-rose-500/[0.03] pointer-events-none" />
                     <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-white/15 to-transparent" />
 
@@ -296,7 +222,7 @@ export default function SignupPage() {
                                             <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focusedField === 'username' ? 'text-purple-400' : 'text-zinc-600'}`}>
                                                 <UserIcon className="w-4 h-4" />
                                             </div>
-                                            <Input id="username" name="username" placeholder="johndoe" required onChange={handleChange}
+                                            <Input id="username" name="username" placeholder="johndoe" required value={formData.username} onChange={handleChange}
                                                 onFocus={() => setFocusedField('username')} onBlur={() => setFocusedField(null)}
                                                 className="h-14 pl-12 bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-700 focus:bg-white/[0.06] focus:border-purple-500/40 focus:shadow-[0_0_25px_rgba(139,92,246,0.1)] transition-all duration-300 rounded-2xl"
                                             />
@@ -315,7 +241,7 @@ export default function SignupPage() {
                                             <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focusedField === 'email' ? 'text-amber-400' : 'text-zinc-600'}`}>
                                                 <Mail className="w-4 h-4" />
                                             </div>
-                                            <Input id="email" name="email" type="email" placeholder="m@example.com" required onChange={handleChange}
+                                            <Input id="email" name="email" type="email" placeholder="m@example.com" required value={formData.email} onChange={handleChange}
                                                 onFocus={() => setFocusedField('email')} onBlur={() => setFocusedField(null)}
                                                 className="h-14 pl-12 bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-700 focus:bg-white/[0.06] focus:border-amber-500/40 focus:shadow-[0_0_25px_rgba(245,158,11,0.1)] transition-all duration-300 rounded-2xl"
                                             />
@@ -335,7 +261,7 @@ export default function SignupPage() {
                                         <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focusedField === 'password' ? 'text-cyan-400' : 'text-zinc-600'}`}>
                                             <Lock className="w-4 h-4" />
                                         </div>
-                                        <Input id="password" name="password" type={showPassword ? "text" : "password"} required onChange={handleChange}
+                                        <Input id="password" name="password" type={showPassword ? "text" : "password"} required value={formData.password} onChange={handleChange}
                                             onFocus={() => setFocusedField('password')} onBlur={() => setFocusedField(null)}
                                             placeholder="Min. 8 characters"
                                             className="h-14 pl-12 pr-12 bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-700 focus:bg-white/[0.06] focus:border-cyan-500/40 focus:shadow-[0_0_25px_rgba(6,182,212,0.1)] transition-all duration-300 rounded-2xl"
@@ -411,7 +337,7 @@ export default function SignupPage() {
                                         <div className={`absolute left-4 top-1/2 -translate-y-1/2 transition-colors duration-300 ${focusedField === 'confirm' ? 'text-rose-400' : 'text-zinc-600'}`}>
                                             <Lock className="w-4 h-4" />
                                         </div>
-                                        <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} required onChange={handleChange}
+                                        <Input id="confirmPassword" name="confirmPassword" type={showConfirmPassword ? "text" : "password"} required value={formData.confirmPassword} onChange={handleChange}
                                             onFocus={() => setFocusedField('confirm')} onBlur={() => setFocusedField(null)}
                                             placeholder="Re-enter password"
                                             className="h-14 pl-12 pr-12 bg-white/[0.03] border-white/[0.06] text-white placeholder:text-zinc-700 focus:bg-white/[0.06] focus:border-rose-500/40 focus:shadow-[0_0_25px_rgba(244,63,94,0.1)] transition-all duration-300 rounded-2xl"

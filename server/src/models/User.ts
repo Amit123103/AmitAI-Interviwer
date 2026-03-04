@@ -5,11 +5,10 @@ export interface IUser extends Document {
     email: string;
     passwordHash: string;
     role: 'student' | 'admin' | 'sub-admin';
-    xp: number;
-    weeklyXp: number;
+    amitaiCoins: number;
+    weeklyCoins: number;
     currentWeek: string;
     level: number;
-    streak: number;
     lastPracticeDate: Date | null;
     achievements: Array<{
         id: string;
@@ -23,7 +22,6 @@ export interface IUser extends Document {
         totalCodeLines: number;
         averageScore: number;
     };
-    maxStreak: number;
     subscriptionStatus: 'free' | 'pro';
     stripeCustomerId?: string;
     subscriptionId?: string;
@@ -51,8 +49,8 @@ export interface IUser extends Document {
         date: Date; // To track which day this mission belongs to
     }>;
     weeklyGoal: {
-        targetXp: number;
-        currentXp: number;
+        targetCoins: number;
+        currentCoins: number;
         startDate: Date;
         endDate: Date;
     };
@@ -77,11 +75,10 @@ const UserSchema: Schema = new Schema(
         email: { type: String, required: true, unique: true },
         passwordHash: { type: String, required: true },
         role: { type: String, enum: ['student', 'admin', 'sub-admin'], default: 'student' },
-        xp: { type: Number, default: 0 },
-        weeklyXp: { type: Number, default: 0 },
+        amitaiCoins: { type: Number, default: 0 },
+        weeklyCoins: { type: Number, default: 0 },
         currentWeek: { type: String, default: '' },
         level: { type: Number, default: 1 },
-        streak: { type: Number, default: 0 },
         lastPracticeDate: { type: Date, default: null },
         dailyMissions: [{
             _id: false,
@@ -93,8 +90,8 @@ const UserSchema: Schema = new Schema(
             date: { type: Date, default: Date.now }
         }],
         weeklyGoal: {
-            targetXp: { type: Number, default: 1000 },
-            currentXp: { type: Number, default: 0 },
+            targetCoins: { type: Number, default: 1000 },
+            currentCoins: { type: Number, default: 0 },
             startDate: Date,
             endDate: Date
         },
@@ -111,7 +108,6 @@ const UserSchema: Schema = new Schema(
             totalCodeLines: { type: Number, default: 0 },
             averageScore: { type: Number, default: 0 }
         },
-        maxStreak: { type: Number, default: 0 },
         subscriptionStatus: { type: String, enum: ['free', 'pro'], default: 'free' },
         stripeCustomerId: { type: String },
         subscriptionId: { type: String },

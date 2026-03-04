@@ -35,36 +35,38 @@ export default function TiltCard({ children, className = "", ...props }: TiltCar
     }
 
     return (
-        <motion.div
-            ref={cardRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={handleMouseLeave}
-            style={{
-                rotateX,
-                rotateY,
-                transformStyle: "preserve-3d",
-            }}
-            transition={{ type: "spring", damping: 20, stiffness: 300 }}
-            className={`relative ${className}`}
-            {...props}
-        >
-            <div style={{ transform: "translateZ(30px)" }}>
-                {children}
-            </div>
+        <div style={{ perspective: "1000px" }} className={`relative w-full h-full ${className}`}>
+            <motion.div
+                ref={cardRef}
+                onMouseMove={handleMouseMove}
+                onMouseEnter={() => setIsHovered(true)}
+                onMouseLeave={handleMouseLeave}
+                style={{
+                    rotateX,
+                    rotateY,
+                    transformStyle: "preserve-3d",
+                }}
+                transition={{ type: "spring", damping: 20, stiffness: 300 }}
+                className="relative w-full h-full"
+                {...props}
+            >
+                <div className="w-full h-full relative z-50">
+                    {children}
+                </div>
 
-            {/* Depth Shine Effect */}
-            {isHovered && (
-                <motion.div
-                    className="absolute inset-0 z-10 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_var(--x)_var(--y),rgba(255,255,255,0.05)_0%,transparent_50%)]"
-                    style={{
-                        // @ts-ignore
-                        "--x": `${(mouseX.get() + 0.5) * 100}%`,
-                        // @ts-ignore
-                        "--y": `${(mouseY.get() + 0.5) * 100}%`,
-                    }}
-                />
-            )}
-        </motion.div>
+                {/* Depth Shine Effect */}
+                {isHovered && (
+                    <motion.div
+                        className="absolute inset-0 z-10 pointer-events-none opacity-40 bg-[radial-gradient(circle_at_var(--x)_var(--y),rgba(255,255,255,0.05)_0%,transparent_50%)]"
+                        style={{
+                            // @ts-ignore
+                            "--x": `${(mouseX.get() + 0.5) * 100}%`,
+                            // @ts-ignore
+                            "--y": `${(mouseY.get() + 0.5) * 100}%`,
+                        }}
+                    />
+                )}
+            </motion.div>
+        </div>
     )
 }

@@ -33,6 +33,8 @@ from app.api.negotiation import router as negotiation_router
 from app.api.technical import router as technical_router
 from app.api.adaptive import router as adaptive_router
 from app.endpoints_coding import router as coding_router
+from app.api.gesture import router as gesture_router
+from app.api.mentor import router as mentor_router
 
 load_dotenv()
 
@@ -83,6 +85,8 @@ app.include_router(negotiation_router)
 app.include_router(technical_router)
 app.include_router(adaptive_router)
 app.include_router(coding_router)
+app.include_router(gesture_router)
+app.include_router(mentor_router)
 
 @app.get("/favicon.ico")
 async def favicon():

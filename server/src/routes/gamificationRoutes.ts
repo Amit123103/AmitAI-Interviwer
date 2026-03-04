@@ -30,50 +30,28 @@ router.post('/sync', async (req, res) => {
             return res.status(404).json({ message: "User not found" });
         }
 
-        // A. Handle XP Update
-        if (action === 'ADD_XP' && typeof value === 'number' && value > 0) {
-            user.xp = (user.xp || 0) + value;
-            user.weeklyXp = (user.weeklyXp || 0) + value;
+        // A. Handle Coin Update
+        if (action === 'ADD_COINS' && typeof value === 'number' && value > 0) {
+            user.amitaiCoins = (user.amitaiCoins || 0) + value;
+            user.weeklyCoins = (user.weeklyCoins || 0) + value;
 
-            // Level Up Logic (Simple formula: Level * 1000 * 1.5)
-            const requiredXp = user.level * 1000 * 1.5;
-            if (user.xp >= requiredXp) {
+            // Level Up Logic (Coins threshold)
+            const requiredCoins = user.level * 1000 * 2;
+            if (user.amitaiCoins >= requiredCoins) {
                 user.level += 1;
-                user.xp -= requiredXp; // Carry over or reset? Usually continuous. 
-                // Let's keep XP cumulative but check total. 
-                // Actually, let's just increment level if threshold met based on total XP
-                // Simplified:
-                // nextLevelXp = (Level^2) * 100.
-
-                // Let's stick to the current implementation where 'xp' is total accumulated.
-                // We'll calculate level on the fly or update it here.
-                // For now, simple update:
             }
         }
 
-        // B. Handle Streak
+        // B. Handle Session Activity (Replacing legacy streak logic)
         if (action === 'PRACTICE_COMPLETE') {
             const today = new Date();
-            if (user.lastPracticeDate) {
-                const last = new Date(user.lastPracticeDate);
-                const diffTime = Math.abs(today.getTime() - last.getTime());
-                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-                if (diffDays === 1) {
-                    user.streak += 1;
-                } else if (diffDays > 1) {
-                    user.streak = 1; // Reset
-                }
-                // If diffDays == 0 (same day), do nothing
-            } else {
-                user.streak = 1;
-            }
             user.lastPracticeDate = today;
-            user.maxStreak = Math.max(user.maxStreak, user.streak);
+            // No more streak increments, but we could add bonus coins here
+            user.amitaiCoins += 50;
+            user.weeklyCoins += 50;
         }
 
         // C. Daily Missions Check
-        // If no missions for today, generate them
         if (!user.dailyMissions) user.dailyMissions = [];
         const todayStr = new Date().toDateString();
         const hasTodayMissions = user.dailyMissions.some(m => new Date(m.date).toDateString() === todayStr);
@@ -82,7 +60,7 @@ router.post('/sync', async (req, res) => {
             user.dailyMissions = [
                 { id: 'm1', type: 'practice', target: 1, progress: 0, completed: false, date: new Date() },
                 { id: 'm2', type: 'questions', target: 5, progress: 0, completed: false, date: new Date() },
-                { id: 'm3', type: 'streak', target: 1, progress: user.streak > 0 ? 1 : 0, completed: user.streak > 0, date: new Date() }
+                { id: 'm3', type: 'code', target: 100, progress: 0, completed: false, date: new Date() }
             ];
         }
 
@@ -94,7 +72,8 @@ router.post('/sync', async (req, res) => {
                     m.progress += progressDelta;
                     if (m.progress >= m.target) {
                         m.completed = true;
-                        user.xp += 50; // Bonus for completion
+                        user.amitaiCoins += 50; // Bonus for completion
+                        user.weeklyCoins += 50;
                     }
                 }
             });
@@ -104,32 +83,28 @@ router.post('/sync', async (req, res) => {
             await user.save();
         } catch (saveErr: any) {
             if (saveErr.name === 'VersionError') {
-                console.warn(`Gamification Sync Version Conflict: User ${userId} modified by parallel request. Returning latest state.`);
                 const latestUser = await User.findById(userId);
                 if (latestUser) {
                     return res.json({
-                        xp: latestUser.xp || 0,
+                        amitaiCoins: latestUser.amitaiCoins || 0,
                         level: latestUser.level || 1,
-                        streak: latestUser.streak || 0,
                         dailyMissions: latestUser.dailyMissions || [],
                         achievements: latestUser.achievements || []
                     });
                 }
             }
-            throw saveErr; // Rethrow other errors
+            throw saveErr;
         }
 
         res.json({
-            xp: user.xp || 0,
+            amitaiCoins: user.amitaiCoins || 0,
             level: user.level || 1,
-            streak: user.streak || 0,
             dailyMissions: user.dailyMissions || [],
             achievements: user.achievements || []
         });
 
     } catch (err: any) {
         console.error('Gamification Sync Error:', err.message);
-        console.error('Error Stack:', err.stack);
         res.status(500).json({ message: "Server error", error: err.message });
     }
 });
@@ -138,9 +113,9 @@ router.post('/sync', async (req, res) => {
 router.get('/leaderboard', async (req, res) => {
     try {
         const topUsers = await User.find({})
-            .sort({ xp: -1 })
+            .sort({ amitaiCoins: -1 })
             .limit(10)
-            .select('username xp level streak avatar'); // Add avatar if it exists
+            .select('username amitaiCoins level avatar achievements');
 
         res.json(topUsers);
     } catch (err) {

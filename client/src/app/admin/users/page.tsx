@@ -38,9 +38,9 @@ interface UserEntry {
     email: string
     role: 'student' | 'admin' | 'sub-admin'
     accountStatus: 'active' | 'suspended'
-    xp: number
+    amitaiCoins: number
     level: number
-    streak: number
+    weeklyCoins: number
     stats: {
         totalInterviews: number
         totalCodeLines: number
@@ -502,9 +502,9 @@ export default function UserManagement() {
                                             onClick={() => {
                                                 if (!editMode) {
                                                     setEditData({
-                                                        xp: details.user.xp,
+                                                        amitaiCoins: details.user.amitaiCoins,
                                                         level: details.user.level,
-                                                        streak: details.user.streak,
+                                                        weeklyCoins: details.user.weeklyCoins,
                                                         stats: { ...details.user.stats }
                                                     })
                                                 }
@@ -552,11 +552,11 @@ export default function UserManagement() {
 
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
                                             <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-1">Total XP</label>
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-1">AmitAI Coins</label>
                                                 <input
                                                     type="number"
-                                                    value={editData.xp}
-                                                    onChange={e => setEditData({ ...editData, xp: Number(e.target.value) })}
+                                                    value={editData.amitaiCoins}
+                                                    onChange={e => setEditData({ ...editData, amitaiCoins: Number(e.target.value) })}
                                                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-sm font-bold focus:border-violet-500/50 outline-none"
                                                 />
                                             </div>
@@ -570,11 +570,11 @@ export default function UserManagement() {
                                                 />
                                             </div>
                                             <div className="space-y-2">
-                                                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-1">Streak Days</label>
+                                                <label className="text-[9px] font-black uppercase tracking-widest text-zinc-600 ml-1">Weekly Coins</label>
                                                 <input
                                                     type="number"
-                                                    value={editData.streak}
-                                                    onChange={e => setEditData({ ...editData, streak: Number(e.target.value) })}
+                                                    value={editData.weeklyCoins}
+                                                    onChange={e => setEditData({ ...editData, weeklyCoins: Number(e.target.value) })}
                                                     className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2 text-sm font-bold focus:border-violet-500/50 outline-none"
                                                 />
                                             </div>
@@ -646,9 +646,9 @@ export default function UserManagement() {
                                         <h3 className="text-xs font-black uppercase tracking-[0.2em] text-zinc-500">Student Progression & Stats</h3>
                                         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                             {[
-                                                { label: 'Total XP', value: details.user.xp, icon: TrendingUp, color: 'text-violet-400' },
+                                                { label: 'AmitAI Coins', value: (details.user.amitaiCoins || 0).toLocaleString(), icon: TrendingUp, color: 'text-yellow-400' },
                                                 { label: 'Current Level', value: `LVL ${details.user.level}`, icon: Crown, color: 'text-amber-400' },
-                                                { label: 'Active Streak', value: `${details.user.streak} Days`, icon: Zap, color: 'text-orange-400' },
+                                                { label: 'Weekly Earnings', value: (details.user.weeklyCoins || 0).toLocaleString(), icon: Zap, color: 'text-yellow-500' },
                                                 { label: 'Avg Interview Score', value: `${details.user.stats.averageScore}%`, icon: Shield, color: 'text-emerald-400' }
                                             ].map((stat, i) => (
                                                 <div key={i} className="bg-white/5 border border-white/5 rounded-2xl p-5 flex flex-col gap-3">

@@ -30,16 +30,15 @@ export const protect = async (req: any, res: Response, Next: NextFunction) => {
                 email: user.email,
                 role: user.role,
                 accountStatus: user.accountStatus,
-                xp: user.xp,
+                amitaiCoins: user.amitaiCoins,
                 level: user.level,
-                streak: user.streak,
                 proSubscription: user.proSubscription || { isActive: false, plan: null },
                 preferences: user.preferences || {}
             };
 
             Next();
-        } catch (error) {
-            console.error("Protect Middleware Error:", error);
+        } catch (error: any) {
+            console.warn(`[WARN] Protect Middleware Error: ${error.message || 'Token verification failed'}`);
             res.status(401).json({ message: 'Not authorized, token failed' });
         }
     }

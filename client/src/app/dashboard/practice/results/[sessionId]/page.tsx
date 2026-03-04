@@ -5,9 +5,10 @@ import { useRouter, useParams } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import {
-    Trophy, TrendingUp, TrendingDown, Target, Brain, Flame,
-    Award, ArrowRight, RotateCcw, Home, CheckCircle2, AlertCircle
+    Trophy, TrendingUp, TrendingDown, Target, Brain,
+    Award, ArrowRight, RotateCcw, Home, CheckCircle2, AlertCircle, Sparkles
 } from "lucide-react"
+import AmitAICoin from "@/components/reward-system/AmitAICoin"
 import { Progress } from "@/components/ui/progress"
 import Link from "next/link"
 
@@ -37,9 +38,9 @@ export default function PracticeResultsPage() {
         ) / 3
         setOverallScore(Math.round(avg))
 
-        // Update user streak (mock)
-        const currentStreak = parseInt(localStorage.getItem("practiceStreak") || "0")
-        localStorage.setItem("practiceStreak", (currentStreak + 1).toString())
+        // Award AmitAI Coins (mock logic for results page)
+        const earned = Math.round(avg * 2); // e.g., 100% = 200 coins
+        setSessionData((prev: any) => ({ ...prev, coinsEarned: earned }))
     }, [sessionId, router])
 
     const getPerformanceLevel = (score: number) => {
@@ -70,7 +71,7 @@ export default function PracticeResultsPage() {
 
     const mockBadges = [
         { id: 1, name: "First Practice", icon: "🎯", earned: true },
-        { id: 2, name: "5 Day Streak", icon: "🔥", earned: false },
+        { id: 2, name: "Coin Collector", icon: "🪙", earned: true },
         { id: 3, name: "Perfect Score", icon: "⭐", earned: false },
         { id: 4, name: "10 Sessions", icon: "🏆", earned: false }
     ]
@@ -78,7 +79,6 @@ export default function PracticeResultsPage() {
     if (!sessionData) return null
 
     const performance = getPerformanceLevel(overallScore)
-    const streak = parseInt(localStorage.getItem("practiceStreak") || "1")
 
     return (
         <div className="min-h-screen bg-black text-white p-4 sm:p-6 md:p-10">
@@ -118,10 +118,10 @@ export default function PracticeResultsPage() {
                                 </div>
                                 <div className="w-px h-8 bg-white/10" />
                                 <div>
-                                    <div className="text-zinc-500">Streak</div>
-                                    <div className="text-xl font-bold flex items-center gap-1">
-                                        <Flame className="w-5 h-5 text-orange-500" />
-                                        {streak} days
+                                    <div className="text-zinc-500">Reward</div>
+                                    <div className="text-xl font-bold flex items-center gap-2">
+                                        <AmitAICoin size={20} animate />
+                                        +{sessionData.coinsEarned || 0}
                                     </div>
                                 </div>
                             </div>
@@ -254,8 +254,8 @@ export default function PracticeResultsPage() {
                                 <div
                                     key={badge.id}
                                     className={`p-4 rounded-xl text-center transition-all ${badge.earned
-                                            ? "bg-primary/20 border-2 border-primary"
-                                            : "bg-zinc-900/50 border border-white/5 opacity-50"
+                                        ? "bg-primary/20 border-2 border-primary"
+                                        : "bg-zinc-900/50 border border-white/5 opacity-50"
                                         }`}
                                 >
                                     <div className="text-3xl mb-2">{badge.icon}</div>

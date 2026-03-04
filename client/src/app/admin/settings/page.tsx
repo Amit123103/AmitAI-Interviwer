@@ -73,7 +73,7 @@ export default function AdminSettings() {
     }
 
     const defaultConfigs = [
-        { key: 'xp_multiplier', label: 'XP Multiplier', description: 'Base multiplier for student XP gains', icon: Zap, type: 'number', defaultValue: 1 },
+        { key: 'coin_multiplier', label: 'Coin Multiplier', description: 'Base multiplier for student AmitAI Coin gains', icon: Zap, type: 'number', defaultValue: 1 },
         { key: 'default_difficulty', label: 'Default Difficulty', description: 'Starting difficulty for new interviews', icon: Trophy, type: 'select', options: ['Beginner', 'Intermediate', 'Advanced'], defaultValue: 'Intermediate' },
         { key: 'maintenance_mode', label: 'Maintenance Mode', description: 'Global lock for non-admin users', icon: Lock, type: 'boolean', defaultValue: false },
         { key: 'max_daily_interviews', label: 'Max Daily Interviews', description: 'Limit for free tier users', icon: Shield, type: 'number', defaultValue: 3 }

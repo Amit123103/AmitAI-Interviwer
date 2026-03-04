@@ -4,7 +4,8 @@ import React from "react"
 import { motion } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { History, ArrowRight, Calendar, Trophy, Flame, TrendingUp, BarChart3 } from "lucide-react"
+import { History, ArrowRight, Calendar, Trophy, TrendingUp, BarChart3, Sparkles } from "lucide-react"
+import AmitAICoin from "@/components/reward-system/AmitAICoin"
 import Link from "next/link"
 import DashboardHeader from "@/components/dashboard/DashboardHeader"
 import MeshBackground from "../components/MeshBackground"
@@ -19,28 +20,15 @@ function getScore(item: any): number {
     return Math.round((t + c + f) / 3)
 }
 
-function calcStreak(history: any[]): number {
-    if (!history.length) return 0
-    const unique = [...new Set(
-        history.map(r => new Date(r.createdAt).toDateString())
-    )].sort((a, b) => new Date(b).getTime() - new Date(a).getTime())
-
-    let streak = 1
-    for (let i = 1; i < unique.length; i++) {
-        const prev = new Date(unique[i - 1])
-        const curr = new Date(unique[i])
-        const diffDays = (prev.getTime() - curr.getTime()) / (1000 * 60 * 60 * 24)
-        if (diffDays <= 1.5) streak++
-        else break
-    }
-    return streak
+function calcTotalCoins(history: any[]): number {
+    return history.reduce((acc, curr) => acc + (curr.coinsGained || 0), 0)
 }
 
 function QuickStats({ history }: { history: any[] }) {
     const scores = history.map(getScore)
     const bestScore = scores.length ? Math.max(...scores) : 0
     const bestItem = history.find(r => getScore(r) === bestScore)
-    const streak = calcStreak(history)
+    const totalCoins = calcTotalCoins(history)
     const thisMonth = history.filter(r => {
         const d = new Date(r.createdAt)
         const now = new Date()
@@ -74,12 +62,12 @@ function QuickStats({ history }: { history: any[] }) {
             border: "border-amber-500/20"
         },
         {
-            icon: <Flame className="w-5 h-5 text-orange-400" />,
-            label: "Streak",
-            value: `${streak}`,
-            sub: streak === 1 ? "day" : "days",
-            color: "from-orange-500/20 to-orange-500/5",
-            border: "border-orange-500/20"
+            icon: <AmitAICoin size={20} animate />,
+            label: "Coins Earned",
+            value: `${totalCoins.toLocaleString()}`,
+            sub: "from interviews",
+            color: "from-yellow-500/20 to-yellow-500/5",
+            border: "border-yellow-500/20"
         },
     ]
 
@@ -217,6 +205,14 @@ export default function HistoryPage() {
                                                     <div className="text-left sm:text-right hidden md:block">
                                                         <p className="text-xs uppercase text-zinc-500 font-bold">Focus</p>
                                                         <p className="font-medium text-sm text-zinc-300">{item.persona || 'General'}</p>
+                                                    </div>
+
+                                                    {/* Reward */}
+                                                    <div className="text-left sm:text-right hidden sm:block">
+                                                        <p className="text-xs uppercase text-zinc-500 font-bold">Reward</p>
+                                                        <p className="font-bold text-sm text-yellow-500 flex items-center justify-end gap-1">
+                                                            +{item.coinsGained || 0} <AmitAICoin size={14} />
+                                                        </p>
                                                     </div>
 
                                                     {/* Score */}

@@ -481,3 +481,23 @@ ${cvText.slice(0, 3000)}`
         return "I see. Could you elaborate more on your experience in that area as mentioned in your resume?"
     }
 }
+
+// ─── Direct NLP/Raw Generation ───────────────────────────────────────────────
+export async function generateResponse(
+    prompt: string,
+    _history: any[] = []
+): Promise<{ response: string }> {
+    try {
+        const aiRes = await axios.post(`${OLLAMA_URL}/api/generate`, {
+            model: OLLAMA_MODEL,
+            prompt,
+            stream: false,
+            options: { temperature: 0.1 }
+        }, { timeout: 30000 });
+
+        return { response: aiRes.data.response || '' };
+    } catch (err: any) {
+        console.warn('[ollamaService] generateResponse failed:', err.message);
+        throw err;
+    }
+}

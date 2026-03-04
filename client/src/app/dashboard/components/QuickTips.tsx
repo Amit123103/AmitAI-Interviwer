@@ -55,25 +55,25 @@ export default function QuickTips() {
     const currentTip = tips[index]
 
     return (
-        <div className="bg-zinc-900/40 backdrop-blur-xl border border-white/10 p-8 rounded-2xl relative overflow-hidden group h-full flex flex-col">
-            <div className="absolute top-0 left-0 w-full h-[2px] bg-gradient-to-r from-emerald-500 via-blue-500 to-purple-500" />
-            <div className="absolute top-0 left-0 w-32 h-32 bg-emerald-500/5 rounded-full blur-3xl -z-10" />
+        <div className="bg-slate-900/40 backdrop-blur-2xl border border-white/5 p-8 rounded-2xl relative overflow-hidden group h-full flex flex-col shadow-2xl">
+            <div className="absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-blue-500/50 via-indigo-500/50 to-transparent" />
+            <div className="absolute top-0 left-0 w-32 h-32 bg-blue-500/5 rounded-full blur-3xl -z-10" />
 
             <div className="flex items-center justify-between mb-8 relative z-10">
                 <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20">
-                        <Sparkles className="w-5 h-5 text-emerald-400" />
+                    <div className="w-10 h-10 rounded-xl bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                        <Sparkles className="w-5 h-5 text-blue-400" />
                     </div>
                     <div>
-                        <h3 className="text-lg font-bold text-white">Quick Tips</h3>
-                        <p className="text-xs text-zinc-500">Tips to sharpen your game</p>
+                        <h3 className="text-lg font-bold text-white tracking-tight">Quick Tips</h3>
+                        <p className="text-xs text-slate-500">Sharpen your technique</p>
                     </div>
                 </div>
                 <div className="flex gap-1">
                     {tips.map((_, i) => (
                         <div
                             key={i}
-                            className={`h-1 rounded-full transition-all duration-500 ${i === index ? 'w-4 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 'w-1 bg-white/10'}`}
+                            className={`h-1 rounded-full transition-all duration-500 ${i === index ? 'w-4 bg-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.5)]' : 'w-1 bg-white/10'}`}
                         />
                     ))}
                 </div>
@@ -96,7 +96,7 @@ export default function QuickTips() {
 
                         <div className="relative">
                             <Quote className="absolute -top-4 -left-4 w-10 h-10 text-white/5 -z-10" />
-                            <p className="text-lg font-medium leading-relaxed text-zinc-200 indent-2">
+                            <p className="text-lg font-medium leading-relaxed text-slate-200 indent-2">
                                 {currentTip.content}
                             </p>
                         </div>
@@ -119,7 +119,7 @@ export default function QuickTips() {
                         <ChevronRight className="w-5 h-5" />
                     </button>
                 </div>
-                <button className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1.5 group/btn">
+                <button className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1.5 group/btn uppercase tracking-wider">
                     More tips
                     <ChevronRight className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" />
                 </button>

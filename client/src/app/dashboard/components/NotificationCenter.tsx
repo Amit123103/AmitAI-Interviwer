@@ -31,7 +31,7 @@ export default function NotificationCenter() {
                     setUnreadCount(data.length)
                 }
             } catch (err) {
-                console.error(err)
+                console.warn("Notification fetch failed:", err)
             }
         }
         fetchAnnouncements()

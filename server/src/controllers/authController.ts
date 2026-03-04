@@ -12,7 +12,10 @@ const generateToken = (id: string, role: string) => {
 };
 
 export const registerUser = async (req: Request, res: Response) => {
-    const { username, email, password } = req.body;
+    let { username, email, password } = req.body;
+
+    if (email) email = email.toLowerCase().trim();
+    if (username) username = username.trim();
 
     try {
         console.log("Registration attempt:", { username, email });
@@ -66,12 +69,14 @@ export const registerUser = async (req: Request, res: Response) => {
 };
 
 export const loginUser = async (req: Request, res: Response) => {
-    const { identifier, password } = req.body;
+    let { identifier, password } = req.body;
+
+    if (identifier) identifier = identifier.trim();
 
     try {
         // Query MongoDB — find by email or username
         const user = await User.findOne({
-            $or: [{ email: identifier }, { username: identifier }]
+            $or: [{ email: identifier.toLowerCase() }, { username: identifier }]
         });
 
         if (user && (await bcrypt.compare(password, user.passwordHash))) {

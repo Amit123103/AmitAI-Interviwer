@@ -10,7 +10,7 @@ import {
     Clock,
     Trophy,
     ArrowUpRight,
-    Inbox
+    Rocket
 } from 'lucide-react'
 
 interface ActivityItem {
@@ -37,7 +37,7 @@ export default function ActivityTimeline({ userId }: { userId: string }) {
                     setActivities(await res.json())
                 }
             } catch (err) {
-                console.error(err)
+                console.warn("Activity fetch failed:", err)
             } finally {
                 setLoading(false)
             }
@@ -46,13 +46,16 @@ export default function ActivityTimeline({ userId }: { userId: string }) {
     }, [userId])
 
     return (
-        <div className="glass-card-v2 p-8 space-y-8">
+        <div className="neural-card p-8 md:p-10 space-y-10 bg-slate-900/40 backdrop-blur-2xl border border-white/5">
             <div className="flex items-center justify-between">
-                <h3 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
-                    <History className="w-4 h-4 text-violet-400" /> Recent Activity
+                <h3 className="text-sm font-bold uppercase tracking-widest text-slate-400 flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center border border-blue-500/20">
+                        <History className="w-4 h-4 text-blue-500" />
+                    </div>
+                    Recent Activity
                 </h3>
-                <span className="text-xs text-zinc-500 flex items-center gap-1.5">
-                    <Clock className="w-3 h-3" /> Updated just now
+                <span className="text-[10px] font-bold text-slate-500 flex items-center gap-2 px-3 py-1 bg-white/5 rounded-full border border-white/5">
+                    <Clock className="w-3 h-3 text-emerald-500" /> Live Updates
                 </span>
             </div>
 
@@ -64,57 +67,60 @@ export default function ActivityTimeline({ userId }: { userId: string }) {
                         ))}
                     </div>
                 ) : activities.length === 0 ? (
-                    <div className="py-10 text-center opacity-50 flex flex-col items-center gap-3">
-                        <Inbox className="w-10 h-10 text-zinc-600" />
-                        <p className="text-sm text-zinc-500">No recent activity yet</p>
-                        <p className="text-xs text-zinc-600">Complete an interview or coding challenge to see it here</p>
+                    <div className="py-14 text-center flex flex-col items-center gap-5 group/empty">
+                        <div className="w-20 h-20 rounded-full bg-blue-500/5 flex items-center justify-center border border-blue-500/10 group-hover/empty:border-blue-500/30 transition-all duration-700 shadow-inner">
+                            <Rocket className="w-10 h-10 text-blue-500 animate-bounce" />
+                        </div>
+                        <div className="space-y-2">
+                            <p className="text-lg font-bold text-white tracking-tight">Your journey starts here 🚀</p>
+                            <p className="text-xs text-slate-500 font-medium max-w-[240px] mx-auto leading-relaxed">
+                                Complete a quiz or interview to unlock insights and track your progress.
+                            </p>
+                        </div>
                     </div>
                 ) : (
                     activities.map((act, i) => (
-                        <motion.div
+                        <div
                             key={act.id}
-                            initial={{ opacity: 0, x: -10 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.1 }}
-                            className="flex gap-4 group"
+                            className="flex gap-5 group"
                         >
                             <div className="flex flex-col items-center">
-                                <div className={`w-10 h-10 rounded-xl flex items-center justify-center border border-white/5 shadow-inner transition-all group-hover:scale-110 ${act.type === 'interview' ? 'bg-violet-500/10 text-violet-400' :
-                                    act.type === 'coding' ? 'bg-emerald-500/10 text-emerald-400' :
-                                        act.type === 'payment' ? 'bg-amber-500/10 text-amber-500' :
-                                            'bg-blue-500/10 text-blue-400'
+                                <div className={`w-11 h-11 rounded-2xl flex items-center justify-center border border-white/5 transition-all group-hover:border-white/10 ${act.type === 'interview' ? 'bg-blue-500/5 text-blue-500' :
+                                    act.type === 'coding' ? 'bg-emerald-500/5 text-emerald-400' :
+                                        act.type === 'payment' ? 'bg-blue-500/5 text-blue-500' :
+                                            'bg-indigo-500/5 text-indigo-400'
                                     }`}>
-                                    {act.type === 'interview' ? <Play className="w-4 h-4 fill-current" /> :
+                                    {act.type === 'interview' ? <Play className="w-4 h-4" /> :
                                         act.type === 'coding' ? <Zap className="w-4 h-4" /> :
                                             act.type === 'payment' ? <CreditCard className="w-4 h-4" /> :
                                                 <Trophy className="w-4 h-4" />}
                                 </div>
-                                {i !== activities.length - 1 && <div className="w-[1px] h-full bg-white/5 mt-2" />}
+                                {i !== activities.length - 1 && <div className="w-[1px] h-full bg-white/5 mt-3" />}
                             </div>
-                            <div className="flex-1 pb-6">
+                            <div className="flex-1 pb-8">
                                 <div className="flex justify-between items-start">
                                     <div>
-                                        <h4 className="text-sm font-semibold text-white group-hover:text-violet-400 transition-colors">{act.title}</h4>
-                                        <p className="text-xs text-zinc-500 mt-0.5">{act.subtitle}</p>
+                                        <h4 className="text-sm font-bold text-white group-hover:text-blue-500 transition-colors uppercase tracking-tight">{act.title}</h4>
+                                        <p className="text-xs font-medium text-slate-500 mt-1">{act.subtitle}</p>
                                     </div>
-                                    <div className="flex flex-col items-end gap-1">
-                                        <span className="text-xs text-zinc-500">{new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-md ${act.status === 'success' ? 'bg-emerald-500/10 text-emerald-400' :
-                                            act.status === 'pending' ? 'bg-amber-500/10 text-amber-500' :
-                                                'bg-red-500/10 text-red-400'
+                                    <div className="flex flex-col items-end gap-2">
+                                        <span className="text-[10px] font-bold text-slate-600 uppercase tracking-tighter">{new Date(act.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-lg ${act.status === 'success' ? 'bg-emerald-500/10 text-emerald-500' :
+                                            act.status === 'pending' ? 'bg-blue-500/10 text-blue-500' :
+                                                'bg-red-500/10 text-red-500'
                                             }`}>
-                                            {act.status === 'success' ? 'Done' : act.status === 'pending' ? 'In progress' : 'Failed'}
+                                            {act.status === 'success' ? 'Completed' : act.status === 'pending' ? 'Pending' : 'Failed'}
                                         </span>
                                     </div>
                                 </div>
                             </div>
-                        </motion.div>
+                        </div>
                     ))
                 )}
             </div>
 
-            <button className="w-full h-11 bg-white/5 border border-white/10 hover:bg-white/10 rounded-xl text-xs font-semibold text-zinc-400 transition-all flex items-center justify-center gap-2">
-                View all activity <ArrowUpRight className="w-3 h-3" />
+            <button className="w-full py-4 bg-white/5 border border-white/5 hover:border-blue-500/40 hover:bg-blue-500/5 hover:text-blue-500 rounded-2xl text-[11px] font-bold uppercase tracking-[0.2em] text-slate-400 transition-all flex items-center justify-center gap-3 group active:scale-[0.98]">
+                View Progress Dashboard <ArrowUpRight className="w-4 h-4 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
             </button>
         </div>
     )

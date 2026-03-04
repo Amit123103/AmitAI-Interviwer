@@ -5,9 +5,10 @@ import { useRouter } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import {
     Code2, Search, Star, CheckCircle2, Clock, TrendingUp,
-    Brain, Target, Flame, X, ChevronRight,
+    Brain, Target, X, ChevronRight,
     User, GraduationCap, Building2, Loader2, Sparkles, BarChart2, Play, BookOpen, Trophy, Layers
 } from "lucide-react"
+import AmitAICoin from "@/components/reward-system/AmitAICoin"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
@@ -130,12 +131,17 @@ export default function CodingPracticePage() {
     const [search, setSearch] = useState('')
     const [category, setCategory] = useState('All')
     const [difficulty, setDifficulty] = useState('All')
-    const [userStats, setUserStats] = useState({ totalSolved: 0, streak: 0 })
+    const [user, setUser] = useState<any>(null)
+    const [userStats, setUserStats] = useState({ totalSolved: 0, coins: 0 })
 
     useEffect(() => {
         const stored = localStorage.getItem('practice_profile')
         if (stored) setProfile(JSON.parse(stored))
         else setShowSetup(true)
+
+        const savedUser = localStorage.getItem('user')
+        if (savedUser) setUser(JSON.parse(savedUser))
+
         loadProblems()
     }, [])
 
@@ -144,7 +150,7 @@ export default function CodingPracticePage() {
             const data = await codingApi.getProblems({ limit: 100 })
             setProblems(data.problems)
             const user = JSON.parse(localStorage.getItem('user') || '{}')
-            setUserStats({ totalSolved: user.stats?.accepted || 0, streak: user.streak || 0 })
+            setUserStats({ totalSolved: user.stats?.accepted || 0, coins: user.amitaiCoins || 0 })
         } catch {
             // fallback empty
         } finally {
@@ -209,10 +215,10 @@ export default function CodingPracticePage() {
                 {/* Stats */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                     {[
-                        { icon: CheckCircle2, label: 'Solved', value: userStats.totalSolved, color: 'text-green-400', bg: 'bg-green-500/10' },
-                        { icon: Target, label: 'Level', value: profile?.level || '—', color: 'text-blue-400', bg: 'bg-blue-500/10' },
-                        { icon: Flame, label: 'Streak', value: `${userStats.streak}d`, color: 'text-orange-400', bg: 'bg-orange-500/10' },
-                        { icon: BarChart2, label: 'Total', value: problems.length, color: 'text-purple-400', bg: 'bg-purple-500/10' },
+                        { label: 'Solved', value: userStats.totalSolved, icon: CheckCircle2, color: 'text-emerald-400', bg: 'bg-emerald-500/10' },
+                        { label: 'Level', value: `LVL ${user?.level || 1}`, icon: Trophy, color: 'text-amber-400', bg: 'bg-amber-500/10' },
+                        { label: 'Coins', value: userStats.coins.toLocaleString(), icon: () => <AmitAICoin size={18} animate={false} glow={false} />, color: 'text-yellow-400', bg: 'bg-yellow-500/5' },
+                        { label: 'Directory', value: problems.length, icon: BarChart2, color: 'text-indigo-400', bg: 'bg-indigo-500/10' },
                     ].map(({ icon: Icon, label, value, color, bg }) => (
                         <Card key={label} className="bg-zinc-900/60 border-white/5 rounded-2xl p-4 flex items-center gap-3 hover:border-violet-500/10 hover:shadow-[0_0_20px_rgba(139,92,246,0.04)] transition-all duration-300">
                             <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${bg}`}>

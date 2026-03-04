@@ -4,7 +4,8 @@
 
 import React, { useEffect, useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
-import { Trophy, Medal, User, Flame, Calendar, Award, CheckCircle2 } from "lucide-react"
+import { Trophy, Medal, User, Calendar, Award, CheckCircle2, Sparkles } from "lucide-react"
+import AmitAICoin from "@/components/reward-system/AmitAICoin"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { ArrowLeft } from "lucide-react"
@@ -19,7 +20,7 @@ import { motion, AnimatePresence } from "framer-motion"
 
 // Mapped icons for badges
 const BADGE_ICONS: Record<string, any> = {
-    'flame': Flame,
+    'coin': AmitAICoin,
     'calendar': Calendar,
     'trophy': Trophy,
     'award': Award,
@@ -71,8 +72,7 @@ export default function LeaderboardPage() {
             })
             const data = await res.json()
             if (res.ok) {
-                toast.success(`+50 XP! Streak: ${data.streak} days`)
-                // create confetti or something?
+                toast.success(`+100 AmitAI Coins!`)
             } else {
                 toast.error(data.message || "Failed to claim")
             }
@@ -96,8 +96,8 @@ export default function LeaderboardPage() {
                         icon={<Trophy className="w-8 h-8 text-yellow-500" />}
                         breadcrumbs={[{ label: "Leaderboard" }]}
                     />
-                    <Button onClick={claimDaily} className="bg-gradient-to-r from-orange-500 via-amber-500 to-yellow-500 hover:from-orange-400 hover:via-amber-400 hover:to-yellow-400 text-black font-bold border-0 h-11 sm:h-12 w-full sm:w-auto shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] transition-all duration-300">
-                        <Flame className="w-4 h-4 mr-2" /> Daily Check-in
+                    <Button onClick={claimDaily} className="bg-gradient-to-r from-yellow-500 via-amber-500 to-amber-600 hover:from-yellow-400 hover:via-amber-400 hover:to-amber-500 text-black font-black uppercase tracking-widest text-xs border-0 h-11 sm:h-12 w-full sm:w-auto shadow-[0_0_30px_rgba(245,158,11,0.3)] hover:shadow-[0_0_40px_rgba(245,158,11,0.5)] transition-all duration-300">
+                        <Sparkles className="w-4 h-4 mr-2" /> Daily Check-in
                     </Button>
                 </div>
 
@@ -153,10 +153,11 @@ export default function LeaderboardPage() {
                                                         </div>
                                                     </div>
                                                     <div className="text-right">
-                                                        <div className="font-mono text-xl font-bold bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 bg-clip-text text-transparent">
-                                                            {period === 'weekly' ? u.weeklyXp || 0 : u.xp} XP
+                                                        <div className="flex items-center justify-end gap-1 font-mono text-xl font-bold text-yellow-500">
+                                                            {(period === 'weekly' ? u.weeklyCoins || 0 : u.amitaiCoins || 0).toLocaleString()}
+                                                            <AmitAICoin size={16} animate={index < 3} glow={index === 0} />
                                                         </div>
-                                                        {period === 'weekly' && <div className="text-[8px] text-zinc-600 uppercase tracking-[0.2em] font-black">Weekly Cycle</div>}
+                                                        {period === 'weekly' && <div className="text-[8px] text-zinc-600 uppercase tracking-[0.2em] font-black mt-1 text-right">Weekly Earnings</div>}
                                                     </div>
                                                 </div>
                                             </motion.div>
@@ -178,16 +179,16 @@ export default function LeaderboardPage() {
                             </CardHeader>
                             <CardContent className="grid grid-cols-2 gap-4">
                                 <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center relative overflow-hidden group">
-                                    <div className="absolute inset-0 bg-orange-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <Flame className="w-6 h-6 text-orange-500 mx-auto mb-2 relative z-10" />
-                                    <div className="text-2xl font-black relative z-10">{user?.streak || 0}</div>
-                                    <div className="text-[8px] font-black text-zinc-500 uppercase tracking-widest relative z-10">Day Streak</div>
+                                    <div className="absolute inset-0 bg-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                    <Sparkles className="w-6 h-6 text-yellow-500 mx-auto mb-2 relative z-10" />
+                                    <div className="text-2xl font-black relative z-10">{(user?.weeklyCoins || 0).toLocaleString()}</div>
+                                    <div className="text-[8px] font-black text-zinc-500 uppercase tracking-widest relative z-10">Weekly Total</div>
                                 </div>
                                 <div className="bg-white/5 p-4 rounded-xl border border-white/5 text-center relative overflow-hidden group">
                                     <div className="absolute inset-0 bg-yellow-500/5 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                    <Trophy className="w-6 h-6 text-yellow-500 mx-auto mb-2 relative z-10" />
-                                    <div className="text-2xl font-black relative z-10">{user?.xp || 0}</div>
-                                    <div className="text-[8px] font-black text-zinc-500 uppercase tracking-widest relative z-10">Total XP</div>
+                                    <AmitAICoin size={24} className="mx-auto mb-2 relative z-10" animate />
+                                    <div className="text-2xl font-black relative z-10">{(user?.amitaiCoins || 0).toLocaleString()}</div>
+                                    <div className="text-[8px] font-black text-zinc-500 uppercase tracking-widest relative z-10">Total Coins</div>
                                 </div>
                             </CardContent>
                         </TiltCard>

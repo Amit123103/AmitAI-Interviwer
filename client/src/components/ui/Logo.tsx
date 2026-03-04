@@ -1,12 +1,14 @@
 "use client";
 
 import React from "react";
+import { motion } from "framer-motion";
 
 interface LogoProps {
     size?: number;        // px for the icon
     showText?: boolean;   // show "AMITAI" text next to icon
     showStatus?: boolean; // show green online dot
     className?: string;
+    animate?: boolean;    // enable advanced hover/floating animations
 }
 
 export default function Logo({
@@ -14,32 +16,51 @@ export default function Logo({
     showText = false,
     showStatus = false,
     className = "",
+    animate = true,
 }: LogoProps) {
     return (
         <div className={`flex items-center gap-3 ${className}`}>
             {/* Icon */}
             <div className="relative flex-shrink-0">
-                <div
-                    className="rounded-xl flex items-center justify-center"
+                {/* Advanced glow behind the logo */}
+                {animate && (
+                    <motion.div
+                        animate={{
+                            scale: [1, 1.1, 1],
+                            opacity: [0.4, 0.7, 0.4],
+                        }}
+                        transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "easeInOut"
+                        }}
+                        className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30 blur-xl rounded-full"
+                        style={{ width: size, height: size }}
+                    />
+                )}
+
+                <motion.img
+                    animate={animate ? {
+                        y: [-2, 2, -2],
+                    } : {}}
+                    whileHover={animate ? {
+                        scale: 1.05,
+                        rotate: [0, -5, 5, 0],
+                        filter: "drop-shadow(0px 0px 20px rgba(139,92,246,0.8))"
+                    } : {}}
+                    transition={{
+                        y: { duration: 4, repeat: Infinity, ease: "easeInOut" },
+                        rotate: { duration: 0.5 },
+                        scale: { duration: 0.2 }
+                    }}
+                    src="/assets/logo-3d.png"
+                    alt="AMITAI Interviewer Logo"
+                    className="relative z-10 object-contain drop-shadow-[0_0_15px_rgba(59,130,246,0.6)] cursor-pointer"
                     style={{
                         width: size,
                         height: size,
-                        background: "linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #a855f7 100%)",
-                        boxShadow: "0 4px 20px rgba(124, 58, 237, 0.35), 0 0 40px rgba(99, 102, 241, 0.15), inset 0 1px 0 rgba(255,255,255,0.15)",
                     }}
-                >
-                    <span
-                        className="font-extrabold text-white select-none"
-                        style={{
-                            fontSize: size * 0.38,
-                            letterSpacing: "-0.02em",
-                            lineHeight: 1,
-                            textShadow: "0 1px 4px rgba(0,0,0,0.3)",
-                        }}
-                    >
-                        AI
-                    </span>
-                </div>
+                />
                 {/* Online status dot */}
                 {showStatus && (
                     <div

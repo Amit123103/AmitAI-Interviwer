@@ -9,8 +9,8 @@ export interface Badge {
 
 export const BADGES: Record<string, Badge> = {
     first_step: { id: 'first_step', name: 'First Step', description: 'Completed your first interview', icon: 'footprints' },
-    hat_trick: { id: 'hat_trick', name: 'Hat Trick', description: 'Achieved a 3-day streak', icon: 'flame' },
-    on_fire: { id: 'on_fire', name: 'On Fire', description: 'Achieved a 7-day streak', icon: 'zap' },
+    hat_trick: { id: 'hat_trick', name: 'Elite Earner', description: 'Earned over 1000 AmitAI Coins', icon: 'coins' },
+    on_fire: { id: 'on_fire', name: 'Coin Magnet', description: 'Earned over 5000 AmitAI Coins', icon: 'sparkles' },
     marathon: { id: 'marathon', name: 'Marathoner', description: 'Completed 10 interviews', icon: 'trophy' },
     code_ninja: { id: 'code_ninja', name: 'Code Ninja', description: 'Wrote over 1000 lines of code', icon: 'code' },
     night_owl: { id: 'night_owl', name: 'Night Owl', description: 'Completed an interview after 10 PM', icon: 'moon' },
@@ -35,9 +35,9 @@ export const checkBadges = (user: IUser, context: any = {}): any[] => {
         }
     };
 
-    // --- Streak Badges ---
-    if (user.streak >= 3) award('hat_trick');
-    if (user.streak >= 7) award('on_fire');
+    // --- Coin Milestones ---
+    if (user.amitaiCoins >= 1000) award('hat_trick');
+    if (user.amitaiCoins >= 5000) award('on_fire');
 
     // --- Count Badges ---
     if (user.stats.totalInterviews >= 1) award('first_step');
