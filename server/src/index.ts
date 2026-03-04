@@ -60,6 +60,8 @@ app.use(cors({
             'https://amit-ai-interviwer.vercel.app',
             'https://amit-ai-interviwer-git-main-amitakhil001-7185s-projects.vercel.app',
             'https://amit-ai-interviwer-10x6s7ee6-amitakhil001-7185s-projects.vercel.app',
+            'https://interviewer-amit123103s-projects.vercel.app',
+            'https://interviewer-git-main-amit123103s-projects.vercel.app',
         ],
     credentials: true,
 }));
