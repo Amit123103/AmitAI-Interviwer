@@ -1,11 +1,21 @@
-import cv2
-import mediapipe as mp
-from mediapipe.python.solutions import hands as mp_hands
 import numpy as np
 import base64
 
+# Graceful imports — mediapipe/opencv may not be available on cloud platforms
+try:
+    import cv2
+    import mediapipe as mp
+    from mediapipe.python.solutions import hands as mp_hands
+    HAS_MEDIAPIPE = True
+except (ImportError, AttributeError):
+    HAS_MEDIAPIPE = False
+    print("⚠️  mediapipe/opencv not available — gesture detection disabled")
+
 class HandGestureDetector:
     def __init__(self):
+        if not HAS_MEDIAPIPE:
+            self.hands = None
+            return
         self.mp_hands = mp_hands
         self.hands = self.mp_hands.Hands(
             static_image_mode=False,
@@ -15,6 +25,9 @@ class HandGestureDetector:
         )
 
     def process_frame(self, base64_image_data: str):
+        if not HAS_MEDIAPIPE or self.hands is None:
+            return {"action": "none", "error": "mediapipe not available on this platform"}
+        
         try:
             # Decode base64 to OpenCV image
             nparr = np.frombuffer(base64.b64decode(base64_image_data.split(',')[1] if ',' in base64_image_data else base64_image_data), np.uint8)
