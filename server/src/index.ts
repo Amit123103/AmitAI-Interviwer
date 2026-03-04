@@ -163,7 +163,7 @@ initCronJobs();
 
 const PORT = Number(process.env.PORT) || 5001;
 
-server.listen(PORT, async () => {
+server.listen(PORT, '0.0.0.0', async () => {
     console.log(`\n🚀 SERVER [V3_STABLE] running on port ${PORT}`);
     console.log('─────────────────────────────────────────');
     console.log('  Running startup diagnostics…');
